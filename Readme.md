@@ -10,24 +10,27 @@
 
 This is going to be extensivly testing to make cross browser compatibility easier.
 
-* `$ bundle install`
-* `$ rake jasmine` or `$ rake jasmine:ci`
+#### Install Gems
 
-# Test Server
+`$ bundle install`
 
-Currently there is a small mock Sinatra server that will serve requests and help test CORS support.
+#### Edit Hostfile
 
-#### 1. Edit Hostfile
-
-Add this to your host file for the test server.
+Add this to your host file for the test server. YOu need to do this because localhost is barred from making cross domain requests so you need to put the tests at a real url.
 
 `127.0.0.1 test.local`
 
-#### 2. Start Mock Server
+#### Start Mock Server (Optional)
+
+Currently there is a small mock Sinatra server that will serve requests and help test CORS support. It is hosted on Heroku so you this step is optional.
 
 `$ ruby spec/test_server.rb`
 
-access the tests at `test.local:8888` CORS freaks out on localhost.
+#### Run Tests
+
+`$ rake jasmine` or `$ rake jasmine:ci`
+
+Access the tests at `test.local:8888`.
 
 #### Notes on tests
 
@@ -38,50 +41,8 @@ access the tests at `test.local:8888` CORS freaks out on localhost.
 # Todos
 * Session persistance
 * HTML5 Geolocation Helpers
-* Batching
+* Batching and deferred lists
 * Socket helpers (socket.io and native websockets)
-
-### Alternate Method Syntax
-
-#### As an object
-
-We should support passing an object to the `get`, `post` and `request` methods. Perhaps a good way to approach this is to make `makeRequest` take an object but transform anything passed to it into an object.
-
-```javascript
-geoloqi.get({
-  method: "location/history",
-  parms: {
-    count: 10,
-    accuracy: 100,
-    thinning: 100
-  },
-  callback: function(){},
-  context: this
-});
-
-geoloqi.get(object);
-```
-
-#### With optional params
-
-We should make parms optional, this is good for things link `location/last`.
-
-```javascript
-geolqoi.get(method, callback)
-geolqoi.get(method, callback, context)
-```
-
-#### With optional callback (deferreds)
-
-We should make callbacks optional, this would encourage use of deferreds.
-
-```javascript
-geolqoi.get(method)
-geolqoi.get(method, data)
-geolqoi.get(method, parms, context)
-```
-
-# Docs
 
 # geoloqi.get() and geoloqi.post()
 
@@ -89,7 +50,7 @@ geolqoi.get(method, parms, context)
 `geoloqi.get(method, callback);`
 `geoloqi.get(method, callback, context);`
 
-Params and callback are optional, if you define a callback you can optionally declare a context for your callback to be run under.
+`data` and `callback` are optional, if you define a `callback` you can optionally declare a `context` for your callback to be run under.
 
 If you want to use a syntax similar to jQuery or other libraries you can also pass an object.
 
@@ -107,5 +68,29 @@ geoloqi.post({
     tags: ["geoloqiHQ"]
   },
   callback: callbackFunction
+});
+```
+
+# geoloqi.request(http_method, method, data, callback, context);
+`geoloqi.request()` is the same as `geoloqi.get()` and `geoloqi.post()` but there is a new first parameter that specifies the type of request. This method also returns the `XMLHttpRequest` or `XDomainRequest` object in the callback insteed of `response` and `error`.
+
+```
+geoloqi.request("POST", "location/update", {
+  latitude:  45,
+  longitude: 45
+}, function(xhr){
+  console.log(xhr);
+});
+
+```
+geoloqi.request("POST", {
+  method: "location/update",
+  data: {
+    latitude: 12,
+    longitude: 12
+  },
+  callback: function(xhr){
+    console.log(xhr);
+  }
 });
 ```
