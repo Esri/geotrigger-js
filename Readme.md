@@ -81,6 +81,7 @@ geoloqi.request("POST", "location/update", {
 }, function(xhr){
   console.log(xhr);
 });
+```
 
 ```
 geoloqi.request("POST", {
