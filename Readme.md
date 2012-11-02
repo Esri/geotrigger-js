@@ -27,16 +27,16 @@ Add this to your host file for the test server.
 
 `$ ruby spec/test_server.rb`
 
+access the tests at `test.local:8888` CORS freaks out on localhost.
+
 #### Notes on tests
 
-Right now both jquery and dojo are being loaded. You should also test without then loaded. Just comment out lines 14-15 in /spec/javascripts/support/jasmine.yml, restart the test server and rerun the tests.
+* You will also need to change the location of the mock server if you want to use a different server from the Heroku hosted one.
+* Right now both jQuery and Dojo are being loaded. You should also test without then loaded. Just comment out lines 14-15 in /spec/javascripts/support/jasmine.yml, restart the test server and rerun the tests.
+* You might get timeout errors if the Heroku server is idled just rerun the tests.
 
 # Todos
-
-* Alternate method signatures (see below)
 * Session persistance
-* Tests for the context object
-* Support context for deferreds
 * HTML5 Geolocation Helpers
 * Batching
 * Socket helpers (socket.io and native websockets)
