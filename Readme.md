@@ -71,7 +71,7 @@ geoloqi.post({
 });
 ```
 
-# geoloqi.request(http_method, method, data, callback, context);
+# geoloqi.request();
 `geoloqi.request()` is the same as `geoloqi.get()` and `geoloqi.post()` but there is a new first parameter that specifies the type of request. This method also returns the `XMLHttpRequest` or `XDomainRequest` object in the callback insteed of `response` and `error`.
 
 ```
