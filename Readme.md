@@ -8,10 +8,19 @@
 
 # Tests
 
-This is going to be extensivly testing to make cross browser compatibility easier.
+Testing is done via [Grunt](http://gruntjs.com/) and [Phanton JS](http://phantomjs.org/). To install these just run...
 
-* `$ bundle install`
-* `$ rake jasmine` or `$ rake jasmine:ci`
+* `npm install grunt -g`
+* `npm install grunt-jasmine-task`
+* `brew install phantomjs`
+
+Once these are installed you can now run the tests with `grunt jasmine`.
+
+If you do not want to run tests from the command line just open up `spec/SpecRunner.html` in your browser.
+
+# Building
+
+Make sure you have all the testing dependancies installed then run `grunt` from the command line. If the files lints and passes all the tests it will be concatinated and minified to the `dist` folder.
 
 # Test Server
 
@@ -33,10 +42,7 @@ Right now both jquery and dojo are being loaded. You should also test without th
 
 # Todos
 
-* Alternate method signatures (see below)
 * Session persistance
-* Tests for the context object
-* Support context for deferreds
 * HTML5 Geolocation Helpers
 * Batching
 * Socket helpers (socket.io and native websockets)

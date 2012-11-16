@@ -1,7 +1,6 @@
 var geoloqi = ( function() {
   /* Configuration Variables */
-  var version        = "0.0.1";
-  var build          = "";
+  var version        = "2.0.0-alpha1";
   var apiPath        = "http://cors-server.herokuapp.com/";
   var exports        = {};
   var auth           = {};
@@ -206,7 +205,7 @@ var geoloqi = ( function() {
   /* Event Utils */
   var events = {
     addListener: function(type, listener){
-      if (typeof eventListeners[type] == "undefined"){
+      if (typeof eventListeners[type] === "undefined"){
         eventListeners[type] = [];
       }
 
@@ -271,37 +270,41 @@ var geoloqi = ( function() {
       }
     },
     toQueryString: function(obj, parentObject) {
-      if( typeof obj != 'object' ) return '';
+      if( typeof obj !== 'object' ){
+        return '';
+      }
       var rv = '';
-      for(var prop in obj) if (obj.hasOwnProperty(prop) ) {
+      for(var prop in obj) {
+        if (obj.hasOwnProperty(prop)) {
 
-        var qname = (parentObject) ? parentObject + '.' + prop : prop;
+          var qname = (parentObject) ? parentObject + '.' + prop : prop;
 
-        // Expand Arrays
-        if (obj[prop] instanceof Array) {
-          for( var i = 0; i < obj[prop].length; i++ ){
-            if( typeof obj[prop][i] == 'object' ){
-              rv += '&' + obj2query( obj[prop][i], qname );
-            } else{
-              rv += '&' + encodeURIComponent(qname) + '=' + encodeURIComponent( obj[prop][i] );
+          // Expand Arrays
+          if (obj[prop] instanceof Array) {
+            for( var i = 0; i < obj[prop].length; i++ ){
+              if( typeof obj[prop][i] === 'object' ){
+                rv += '&' + util.toQueryString( obj[prop][i], qname );
+              } else{
+                rv += '&' + encodeURIComponent(qname) + '=' + encodeURIComponent( obj[prop][i] );
+              }
             }
-          }
-        // Expand Dates
-        } else if (obj[prop] instanceof Date) {
-          rv += '&' + encodeURIComponent(qname) + '=' + obj[prop].getTime();
+          // Expand Dates
+          } else if (obj[prop] instanceof Date) {
+            rv += '&' + encodeURIComponent(qname) + '=' + obj[prop].getTime();
 
-        // Expand Objects
-        } else if (obj[prop] instanceof Object) {
-          // If they're String() or Number() etc
-          if (obj.toString && obj.toString !== Object.prototype.toString){
-            rv += '&' + encodeURIComponent(qname) + '=' + encodeURIComponent( obj[prop].toString() );
-          // Otherwise, we want the raw properties
-          } else{
-            rv += '&' + util.toQueryString(obj[prop], qname);
+          // Expand Objects
+          } else if (obj[prop] instanceof Object) {
+            // If they're String() or Number() etc
+            if (obj.toString && obj.toString !== Object.prototype.toString){
+              rv += '&' + encodeURIComponent(qname) + '=' + encodeURIComponent( obj[prop].toString() );
+            // Otherwise, we want the raw properties
+            } else{
+              rv += '&' + util.toQueryString(obj[prop], qname);
+            }
+          // Output non-object
+          } else {
+            rv += '&' + encodeURIComponent(qname) + '=' + encodeURIComponent( obj[prop] );
           }
-        // Output non-object
-        } else {
-          rv += '&' + encodeURIComponent(qname) + '=' + encodeURIComponent( obj[prop] );
         }
       }
       return rv.replace(/^&/,'');

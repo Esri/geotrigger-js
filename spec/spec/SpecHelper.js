@@ -62,7 +62,6 @@ beforeEach(function() {
 
         // if the keys represent an object make sure that it matches.
         else if(object1[key] instanceof Array && object2[key] instanceof Array) {
-          console.log(arrySignaturesMatch(object1[key],object2[key]));
           if(!arrySignaturesMatch(object1[key],object2[key])){
             return false;
           }

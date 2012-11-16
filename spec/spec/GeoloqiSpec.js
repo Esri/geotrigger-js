@@ -437,7 +437,6 @@ describe("geoloqi.js", function() {
       } else {
         expect(geoloqi.config.integration).toBeFalsy();
       }
-
     });
 
     it("should run a method without a callback or params and use deferreds", function(){
@@ -465,7 +464,7 @@ describe("geoloqi.js", function() {
       });
     });
 
-     it("should run a method without a callback and use deferreds", function(){
+    it("should run a method without a callback and use deferreds", function(){
       geoloqi.init({
         app_id: "xxx",
         app_secret: "xxx"
@@ -494,7 +493,7 @@ describe("geoloqi.js", function() {
         });
       });
     });
-
+    
     if(window.dojo){
       describe("Dojo integration", function(){
 
