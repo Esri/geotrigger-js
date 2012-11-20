@@ -1,17 +1,19 @@
 (function (root, factory) {
 
-  if (typeof exports === 'object') {
+  if(typeof exports === 'object') {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like enviroments that support module.exports,
     // like Node.
+    XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
     module.exports = factory();
-  } else if (typeof define === 'function' && define.amd) {
+  }else if(typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
     define(factory);
+  } else {
+    root.geoloqi = factory();
   }
 
-  // Browser globals (root is window)
-  if(window && navigator) {
+  if(typeof jasmine === "object") {
     root.geoloqi = factory();
   }
 
@@ -25,7 +27,7 @@
   var config         = {};
 
   /** Initialize the geoloqi.js library */
-  var init = function(options){
+  var configure = function(options){
     if(!options.app_id) {
       throw "geoloqi: You must pass an app_id to geoloqi.init()";
     }
@@ -44,15 +46,19 @@
     }
 
     // if for some reason we have both jquery and dojo defined use whichever is passed or jQuery
-    if(window.jQuery && window.dojo){
-      config.integration = options.integration || window.jQuery;
-    } else {
-      config.integration = window.jQuery || window.dojo;
+    if(typeof jQuery === "function" && typeof dojo === "object"){
+      config.integration = options.integration || jQuery;
+    } else if (typeof jQuery === "function"){
+      config.integration = jQuery;
+    } else if(typeof dojo === "object"){
+      config.integration = dojo;
+    } else if(typeof jQuery === "undefined" && typeof dojo === "undefined"){
+      config.integration = null;
     }
 
     events.fire("init");
   };
-  exports.init = init;
+  exports.configure = configure;
   exports.config = config;
 
   /** Destroys the current authentication */
@@ -69,6 +75,8 @@
 
   /* Internal handler for all requests */
   var makeRequest = function(http_method, method, data, callback, context, xhrCallback) {
+    //console.log(http_method, method, data, callback, context, xhrCallback);
+
     var args = [].splice.call(arguments,0);
 
     //makeRequest(object);
@@ -97,8 +105,15 @@
     }
 
     events.fire("request:started", http_method, method, data);
-    var httpRequest;
-    var callbackContext  = (context) ? context : window;
+
+    var httpRequest, callbackContext;
+    
+    if(typeof window === "undefined"){
+      callbackContext = (context) ? context : {};
+    } else {
+      callbackContext = (context) ? context : window;
+    }
+
     var deferred = (config.integration) ? new config.integration.Deferred() : null;
 
     var handleSuccessfulResponse = function(){
@@ -125,6 +140,7 @@
         if(callback){
           callback.call(callbackContext, response, error);
         }
+
         // do we call a deferred
         if (deferred && !error) {
           deferred.resolve(response);
@@ -168,12 +184,12 @@
       }
     };
 
-    if (window.XDomainRequest) {
+    if (typeof XDomainRequest !== "undefined") {
       httpRequest = new XDomainRequest();
       httpRequest.onload = handleStateChange;
       httpRequest.onerror = handleErrorResponse;
       httpRequest.ontimeout = handleErrorResponse;
-    } else if (window.XMLHttpRequest) {
+    } else if (typeof XMLHttpRequest !== "undefined") {
       httpRequest = new XMLHttpRequest();
       httpRequest.onreadystatechange = handleStateChange;
     }

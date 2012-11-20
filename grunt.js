@@ -46,10 +46,12 @@ module.exports = function(grunt) {
       globals: {
         console: true,
         XDomainRequest: true,
+        XMLHttpRequest: true,
         jQuery: true,
         dojo: true,
         module: true,
-        define: true
+        define: true,
+        require: true
       }
     },
     uglify: {},
@@ -59,12 +61,26 @@ module.exports = function(grunt) {
         errorReporting: true,
         timeout: 20000
       }
+    },
+    jasmine_node: {
+      spec: "./spec/spec/GeoloqiSpec.js",
+      projectRoot: ".",
+      requirejs: false,
+      forceExit: true,
+      jUnit: {
+        report: false,
+        savePath : "./build/reports/jasmine/",
+        useDotNotation: true,
+        consolidate: true
+      }
     }
   });
 
   // Default task.
   grunt.registerTask('default', 'lint jasmine concat min');
+  grunt.registerTask('node', 'lint jasmine_node');
 
   grunt.loadNpmTasks('grunt-jasmine-task');
+  grunt.loadNpmTasks('grunt-jasmine-node');
 
 };

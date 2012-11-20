@@ -8,11 +8,11 @@
 
 # Tests
 
-Testing is done via [Grunt](http://gruntjs.com/) and [Phanton JS](http://phantomjs.org/). To install these just run...
+Testing is done via [Grunt](http://gruntjs.com/) and [Phantom JS](http://phantomjs.org/). To install these just run...
 
-* `npm install grunt -g`
-* `npm install grunt-jasmine-task`
-* `brew install phantomjs`
+If you want to run the tests in a browser with grunt you will need to install Phantom JS.
+
+`brew install phantomjs`
 
 Once these are installed you can now run the tests with `grunt jasmine`.
 

@@ -1,0 +1,23 @@
+{
+  "name": "Geoloqi-JS",
+  "version": "2.0.0",
+  "description": "Small client for interacting the the Geoloqi API.",
+  "main": "src/geoloqi.js",
+  "dependencies": {
+    "xmlhttprequest": "~1.5.0"
+  },
+  "devDependencies": {
+    "grunt": "0.3.17",
+    "grunt-jasmine-node": "0.0.4",
+    "grunt-jasmine-task": "~0.2.3"
+  },
+  "scripts": {
+    "test": "./node_modules/grunt/bin/grunt node"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/geoloqi/geoloqi-js-2.git"
+  },
+  "author": "",
+  "license": "BSD"
+}
