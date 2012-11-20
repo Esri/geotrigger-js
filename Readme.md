@@ -6,35 +6,21 @@
 * Handles Authentication and Persisting Sessions
 * IE 8 and 9 support
 
-# Tests
+# Node Tests
+If you want to run the node tests just `npm test`
+
+# Browser Tests
 
 Testing is done via [Grunt](http://gruntjs.com/) and [Phantom JS](http://phantomjs.org/). To install these just run...
 
-If you want to run the tests in a browser with grunt you will need to install Phantom JS.
+If you want to run the tests in a browser with `grunt` or `grunt jasmine` you will need to install Phantom JS and grunt.
 
-`brew install phantomjs`
+* `npm install grunt -g`
+* `brew install phantomjs`
 
 Once these are installed you can now run the tests with `grunt jasmine`.
 
 If you do not want to run tests from the command line just open up `spec/SpecRunner.html` in your browser.
-
-#### Notes on tests
-
-* You will also need to change the location of the mock server if you want to use a different server from the Heroku hosted one.
-* Right now both jQuery and Dojo are being loaded. You should also test without then loaded. Just comment out lines 14-15 in /spec/javascripts/support/jasmine.yml, restart the test server and rerun the tests.
-* You might get timeout errors if the Heroku server is idled just rerun the tests.
-
-#### Start Mock Server (Optional)
-
-Currently there is a small mock Sinatra server that will serve requests and help test CORS support. It is hosted on Heroku so you this step is optional.
-
-`$ ruby spec/test_server.rb`
-
-#### Edit Hostfile
-
-Add this to your host file for the test server. YOu need to do this because localhost is barred from making cross domain requests so you need to put the tests at a real url.
-
-`127.0.0.1 test.local`
 
 # Building
 

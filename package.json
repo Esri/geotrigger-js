@@ -1,7 +1,7 @@
 {
   "name": "Geoloqi-JS",
   "version": "2.0.0",
-  "description": "Small client for interacting the the Geoloqi API.",
+  "description": "Small client for interacting with the Geoloqi API.",
   "main": "src/geoloqi.js",
   "dependencies": {
     "xmlhttprequest": "~1.5.0"
@@ -18,6 +18,10 @@
     "type": "git",
     "url": "git://github.com/geoloqi/geoloqi-js-2.git"
   },
-  "author": "",
-  "license": "BSD"
+  "author": "Patrick Arlt <parlt@esri.com> (http://patrickarlt.com)",
+  "contributors": [
+    "Patrick Arlt <parlt@esri.com> (http://patrickarlt.com)",
+    "Jerry Sievert <jsievert@esri.com> (http://legitimatesounding.com)",
+  ],
+  "license": "MIT"
 }
