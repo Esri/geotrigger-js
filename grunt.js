@@ -27,7 +27,7 @@ module.exports = function(grunt) {
     },
     watch: {
       files: '<config:lint.files>',
-      tasks: 'lint jasmine'
+      tasks: 'lint jasmine jasmine_node'
     },
     jshint: {
       options: {
@@ -51,7 +51,8 @@ module.exports = function(grunt) {
         dojo: true,
         module: true,
         define: true,
-        require: true
+        require: true,
+        exports: true
       }
     },
     uglify: {},
