@@ -5,6 +5,7 @@
 * Clean Simple API
 * Handles Authentication and Persisting Sessions
 * IE 8 and 9 support
+* AMD and Node.js support
 
 # Node Tests
 If you want to run the node tests just `npm test`
