@@ -1,4 +1,21 @@
-var geoloqi = ( function() {
+(function (root, factory) {
+
+  if (typeof exports === 'object') {
+    // Node. Does not work with strict CommonJS, but
+    // only CommonJS-like enviroments that support module.exports,
+    // like Node.
+    module.exports = factory();
+  } else if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define(factory);
+  }
+
+  // Browser globals (root is window)
+  if(window && navigator) {
+    root.geoloqi = factory();
+  }
+
+}(this, function() {
   /* Configuration Variables */
   var version        = "2.0.0-alpha1";
   var apiPath        = "http://cors-server.herokuapp.com/";
@@ -312,4 +329,4 @@ var geoloqi = ( function() {
   };
 
   return exports;
-}());
+}));

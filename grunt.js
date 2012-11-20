@@ -47,7 +47,9 @@ module.exports = function(grunt) {
         console: true,
         XDomainRequest: true,
         jQuery: true,
-        dojo: true
+        dojo: true,
+        module: true,
+        define: true
       }
     },
     uglify: {},
