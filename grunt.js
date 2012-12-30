@@ -20,7 +20,7 @@ module.exports = function(grunt) {
       },
       version: {
         src: ['<banner:meta.banner>', 'src/terraformer.js'],
-        dest: 'versions/terraformer-<%= meta.version %>.min.js'
+        dest: 'versions/geoloqi-<%= meta.version %>.min.js'
       }
     },
     min: {
@@ -30,7 +30,7 @@ module.exports = function(grunt) {
       },
       version: {
         src: ['<banner:meta.banner>', 'src/terraformer.js'],
-        dest: 'versions/terraformer-<%= meta.version %>.min.js'
+        dest: 'versions/geoloqi-<%= meta.version %>.min.js'
       }
     },
     watch: {
