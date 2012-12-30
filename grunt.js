@@ -17,12 +17,20 @@ module.exports = function(grunt) {
       dist: {
         src: ['<banner:meta.banner>', 'src/geoloqi.js'],
         dest: 'dist/geoloqi.min.js'
+      },
+      version: {
+        src: ['<banner:meta.banner>', 'src/terraformer.js'],
+        dest: 'versions/terraformer-<%= meta.version %>.min.js'
       }
     },
     min: {
       dist: {
         src: ['<banner:meta.banner>', '<config:concat.dist.dest>'],
         dest: 'dist/geoloqi.min.js'
+      },
+      version: {
+        src: ['<banner:meta.banner>', 'src/terraformer.js'],
+        dest: 'versions/terraformer-<%= meta.version %>.min.js'
       }
     },
     watch: {
@@ -78,8 +86,11 @@ module.exports = function(grunt) {
   });
 
   // Default task.
-  grunt.registerTask('default', 'lint jasmine_node jasmine concat min');
+  grunt.registerTask('default', 'lint jasmine_node jasmine concat min concat:version min:version');
+  grunt.registerTask('build', 'lint jasmine_node jasmine concat min');
+  grunt.registerTask('version', 'lint jasmine_node jasmine concat:version min:version');
   grunt.registerTask('node', 'lint jasmine_node');
+  grunt.registerTask('browser', 'lint jasmine');
 
   grunt.loadNpmTasks('grunt-jasmine-task');
   grunt.loadNpmTasks('grunt-jasmine-node');
