@@ -20,7 +20,7 @@
 }(this, function() {
   /* Configuration Variables */
   var version        = "2.0.0-alpha1";
-  var apiPath        = "http://cors-server.herokuapp.com/";
+  var apiPath        = "https://geotriggersdev.geoloqi.com/";
   var exports        = {};
   var auth           = {};
   var eventListeners = {};
