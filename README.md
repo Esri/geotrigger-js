@@ -1,4 +1,8 @@
-# The new geoloqi.js library.
+# geotriggers.js
+
+A lightweight, dependency-free library for interacting with the Geotriggers platform.
+
+## Features
 
 * CORS Support
 * No Dependancies
@@ -7,33 +11,9 @@
 * IE 8 and 9 support
 * AMD and Node.js support
 
-# Node Tests
-If you want to run the node tests just `npm test`
+## Methods
 
-# Browser Tests
-
-Testing is done via [Grunt](http://gruntjs.com/) and [Phantom JS](http://phantomjs.org/). To install these just run...
-
-If you want to run the tests in a browser with `grunt` or `grunt jasmine` you will need to install Phantom JS and grunt.
-
-* `npm install grunt -g`
-* `brew install phantomjs`
-
-Once these are installed you can now run the tests with `grunt jasmine`.
-
-If you do not want to run tests from the command line just open up `spec/specrunner.html` in your browser.
-
-# Building
-
-Make sure you have all the testing dependancies installed then run `grunt` from the command line. If the files lints and passes all the tests it will be concatinated and minified to the `dist` folder.
-
-# Todos
-* Session persistance
-* HTML5 Geolocation Helpers
-* Batching and deferred lists
-* Socket helpers (socket.io and native websockets)
-
-# geoloqi.get() and geoloqi.post()
+### geoloqi.get() and geoloqi.post()
 
 `geoloqi.get(method, data, callback, context);`
 `geoloqi.get(method, callback);`
@@ -60,8 +40,9 @@ geoloqi.post({
 });
 ```
 
-# geoloqi.request();
-`geoloqi.request()` is the same as `geoloqi.get()` and `geoloqi.post()` but there is a new first parameter that specifies the type of request. This method also returns the `XMLHttpRequest` or `XDomainRequest` object in the callback insteed of `response` and `error`.
+### geoloqi.request()
+
+`geoloqi.request()` is the same as `geoloqi.get()` and `geoloqi.post()` but there is a new first parameter that specifies the type of request. This method also returns the `XMLHttpRequest` or `XDomainRequest` object in the callback instead of `response` and `error`.
 
 ```
 geoloqi.request("POST", "location/update", {
@@ -84,3 +65,31 @@ geoloqi.request("POST", {
   }
 });
 ```
+
+## Node Tests
+
+If you want to run the node tests just `npm test`
+
+## Browser Tests
+
+Testing is done via [Grunt](http://gruntjs.com/) and [Phantom JS](http://phantomjs.org/). To install these just run...
+
+If you want to run the tests in a browser with `grunt` or `grunt jasmine` you will need to install Phantom JS and grunt.
+
+* `npm install grunt -g`
+* `brew install phantomjs`
+
+Once these are installed you can now run the tests with `grunt jasmine`.
+
+If you do not want to run tests from the command line just open up `spec/specrunner.html` in your browser.
+
+## Building
+
+Make sure you have all the testing dependancies installed then run `grunt` from the command line. If the files lints and passes all the tests it will be concatinated and minified to the `dist` folder.
+
+## Todos
+
+* Session persistance
+* HTML5 Geolocation Helpers
+* Batching and deferred lists
+* Socket helpers (socket.io and native websockets)
