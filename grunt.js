@@ -15,11 +15,11 @@ module.exports = function(grunt) {
     },
     concat: {
       dist: {
-        src: ['<banner:meta.banner>', 'src/Geotriggers.js'],
+        src: ['<banner:meta.banner>', 'src/geotriggers.js'],
         dest: 'dist/Geotriggers.min.js'
       },
       version: {
-        src: ['<banner:meta.banner>', 'src/Geotriggers.js'],
+        src: ['<banner:meta.banner>', 'src/geotriggers.js'],
         dest: 'versions/Geotriggers-<%= meta.version %>.min.js'
       }
     },
@@ -29,7 +29,7 @@ module.exports = function(grunt) {
         dest: 'dist/Geotriggers.min.js'
       },
       version: {
-        src: ['<banner:meta.banner>', 'src/Geotriggers.js'],
+        src: ['<banner:meta.banner>', 'src/geotriggers.js'],
         dest: 'versions/Geotriggers-<%= meta.version %>.min.js'
       }
     },
@@ -66,13 +66,13 @@ module.exports = function(grunt) {
     uglify: {},
     jasmine: {
       all: {
-        src:['spec/SpecRunner.html'],
+        src:['spec/specrunner.html'],
         errorReporting: true,
         timeout: 20000
       }
     },
     jasmine_node: {
-      spec: "./spec/spec/GeoloqiSpec.js",
+      spec: "./spec/spec/geotriggers-spec.js",
       projectRoot: ".",
       requirejs: false,
       forceExit: true,
