@@ -21,7 +21,7 @@ If you want to run the tests in a browser with `grunt` or `grunt jasmine` you wi
 
 Once these are installed you can now run the tests with `grunt jasmine`.
 
-If you do not want to run tests from the command line just open up `spec/SpecRunner.html` in your browser.
+If you do not want to run tests from the command line just open up `spec/specrunner.html` in your browser.
 
 # Building
 

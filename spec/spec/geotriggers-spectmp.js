@@ -235,7 +235,7 @@ describe("custom spec helpers", function(){
   });
 });
 
-describe("Geotriggers.js", function() {
+describe("geotriggers.js", function() {
 
   it("should throw an error if initialized without an application_id", function(){
     expect(function(){
