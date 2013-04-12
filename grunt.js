@@ -4,7 +4,7 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     meta: {
-      version: '2.0.0alpha1',
+      version: '0.0.1',
       banner: '/*! Geoloqi JS - <%= meta.version %> - <%= grunt.template.today("yyyy-mm-dd") %>\n' +
         '*   https://github.com/geoloqi/geoloqi-js-2\n' +
         '*   Copyright (c) <%= grunt.template.today("yyyy") %> Environmental Systems Research Institute, Inc.\n' +
@@ -15,22 +15,22 @@ module.exports = function(grunt) {
     },
     concat: {
       dist: {
-        src: ['<banner:meta.banner>', 'src/geoloqi.js'],
-        dest: 'dist/geoloqi.min.js'
+        src: ['<banner:meta.banner>', 'src/Geotriggers.js'],
+        dest: 'dist/Geotriggers.min.js'
       },
       version: {
-        src: ['<banner:meta.banner>', 'src/terraformer.js'],
-        dest: 'versions/geoloqi-<%= meta.version %>.min.js'
+        src: ['<banner:meta.banner>', 'src/Geotriggers.js'],
+        dest: 'versions/Geotriggers-<%= meta.version %>.min.js'
       }
     },
     min: {
       dist: {
         src: ['<banner:meta.banner>', '<config:concat.dist.dest>'],
-        dest: 'dist/geoloqi.min.js'
+        dest: 'dist/Geotriggers.min.js'
       },
       version: {
-        src: ['<banner:meta.banner>', 'src/terraformer.js'],
-        dest: 'versions/geoloqi-<%= meta.version %>.min.js'
+        src: ['<banner:meta.banner>', 'src/Geotriggers.js'],
+        dest: 'versions/Geotriggers-<%= meta.version %>.min.js'
       }
     },
     watch: {
