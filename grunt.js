@@ -16,21 +16,21 @@ module.exports = function(grunt) {
     concat: {
       dist: {
         src: ['<banner:meta.banner>', 'src/geotriggers.js'],
-        dest: 'dist/Geotriggers.min.js'
+        dest: 'dist/geotriggers.min.js'
       },
       version: {
         src: ['<banner:meta.banner>', 'src/geotriggers.js'],
-        dest: 'versions/Geotriggers-<%= meta.version %>.min.js'
+        dest: 'versions/geotriggers-<%= meta.version %>.min.js'
       }
     },
     min: {
       dist: {
         src: ['<banner:meta.banner>', '<config:concat.dist.dest>'],
-        dest: 'dist/Geotriggers.min.js'
+        dest: 'dist/geotriggers.min.js'
       },
       version: {
         src: ['<banner:meta.banner>', 'src/geotriggers.js'],
-        dest: 'versions/Geotriggers-<%= meta.version %>.min.js'
+        dest: 'versions/geotriggers-<%= meta.version %>.min.js'
       }
     },
     watch: {
