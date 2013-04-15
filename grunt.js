@@ -72,7 +72,8 @@ module.exports = function(grunt) {
       }
     },
     jasmine_node: {
-      spec: "./spec/spec/geotriggers-spec.js",
+      specNameMatcher: "-spec",
+      specFolders: ["./spec/spec"],
       projectRoot: ".",
       requirejs: false,
       forceExit: true,
