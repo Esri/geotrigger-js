@@ -21,18 +21,18 @@
   Configuration Variables
   -----------------------------------
   */
-  var version        = "0.0.1";
-  var geotriggersUrl = "https://geotriggersdev.arcgis.com";
-  var tokenUrl = "https://devext.arcgis.com/sharing/oauth2/token";
+  var version           = "0.0.1";
+  var geotriggersUrl    = "https://geotriggersdev.arcgis.com";
+  var tokenUrl          = "https://devext.arcgis.com/sharing/oauth2/token";
   var registerDeviceUrl = "https://devext.arcgis.com/sharing/oauth2/registerDevice";
-  var exports = {};
+  var exports           = {};
 
   /*
   Custom Deferred Callbacks.
   -----------------------------------
   */
 
-  Deferred = function Deferred() {
+  var Deferred = function Deferred() {
     this._thens = [];
   };
 
@@ -259,7 +259,7 @@
 
     // if we are not authenticated yet save these options and deferred for later
     if(!this.authenticated() && !options.authCall){
-      this.log("Geotriggers.Session : not authenticated queueing request");
+      this.log("Geotriggers.Session : not authenticated, queueing request");
       this._requestQueue.push({
         deferred: deferred,
         options: options
@@ -278,10 +278,11 @@
       addCallbacksToDeferred: true
     };
 
-    //merge settings and defaults
+    // merge settings and defaults
     var settings = util.merge(defaults, options);
-    this.log("Geotriggers.Session : mergeing request defaults and ");
-    // assume this is a request to getriggers is it doesnt start with (http|https)://
+    this.log("Geotriggers.Session : merging request defaults and ");
+
+    // assume this is a request to geotriggers if it doesn't start with (http|https)://
     var geotriggersRequest = settings.method.match(/^https?:\/\//);
 
     // create the url for the request
@@ -340,7 +341,8 @@
         message: "your request could not be completed"
       };
       deferred.reject(error);
-      events.fire("request:end");
+      // `events` does not exist
+      // events.fire("request:end");
     };
 
     // callback for handling state change
@@ -372,7 +374,7 @@
     // Convert parameters to form vars for transport
     var queryString = util.toQueryString(settings.params);
 
-    // is we are authenticated and this is a geotriggers request and this is not and authCall
+    // if we are authenticated and this is a geotriggers request and this is not an authCall
     if(this.authenticated() && geotriggersRequest && !options.authCall){
       httpRequest.setRequestHeader('Authentication', 'Bearer '+ this.accessToken);
     }
@@ -404,61 +406,90 @@
   var util = {
     bind: function(context, func) {
       var bound, args;
-      if (typeof func !== "function") throw new TypeError();
-      if (typeof Function.prototype.bind == 'function') return func.bind(context);
+
+      if (typeof func !== "function") {
+        throw new TypeError();
+      }
+
+      if (typeof Function.prototype.bind === 'function') {
+        return func.bind(context);
+      }
+
       args = Array.prototype.slice.call(arguments, 2);
+
       return bound = function() {
-        if (!(this instanceof bound)) return func.apply(context, args.concat(Array.prototype.slice.call(arguments)));
-        ctor.prototype = func.prototype;
-        var self = new ctor();
+        if (!(this instanceof bound)) {
+          return func.apply(context, args.concat(Array.prototype.slice.call(arguments)));
+        }
+
+        var Ctor;
+        Ctor.prototype = func.prototype;
+
+        var self = new Ctor();
         var result = func.apply(self, args.concat(Array.prototype.slice.call(arguments)));
-        if (Object(result) === result) return result;
+
+        if (Object(result) === result) {
+          return result;
+        }
+
         return self;
       };
     },
-    /* Merge Object 1 and Object 2. Properties from Object 2 will override properties in Ojbect 1 */
+
+    // Merge Object 1 and Object 2.
+    // Properties from Object 2 will override properties in Object 1.
     merge: function(obj1, obj2){
       var obj3 = {};
+
       for (var obj1attr in obj1) {
         if(obj1.hasOwnProperty(obj1attr)){
           obj3[obj1attr] = obj1[obj1attr];
         }
       }
+
       for (var obj2attr in obj2) {
         if(obj2.hasOwnProperty(obj2attr)){
           obj3[obj2attr] = obj2[obj2attr];
         }
       }
+
       return obj3;
     },
+
     mixin: function(target, mixin){
       for (var attr in mixin) {
         if(mixin.hasOwnProperty(attr)){
           target[attr] = mixin[attr];
         }
       }
+
       return target;
     },
+
     s4: function(){
       return Math.floor(Math.random() * 0x10000).toString(16);
     },
+
     guid: function(){
       return (util.S4() + util.S4() + "-" + util.S4() + "-" + util.S4() + "-" + util.S4() + "-" + util.S4() + util.S4() + util.S4());
     },
+
     log: function(){
       var args = Array.prototype.slice.apply(arguments);
       if (typeof console !== undefined && console.log) {
         console.log.apply(console, args);
       }
     },
+
     toQueryString: function(obj, parentObject) {
-      if( typeof obj !== 'object' ){
+      if( typeof obj !== 'object' ) {
         return '';
       }
+
       var rv = '';
+
       for(var prop in obj) {
         if (obj.hasOwnProperty(prop)) {
-
           var qname = (parentObject) ? parentObject + '.' + prop : prop;
 
           // Expand Arrays
@@ -470,6 +501,7 @@
                 rv += '&' + encodeURIComponent(qname) + '=' + encodeURIComponent( obj[prop][i] );
               }
             }
+
           // Expand Dates
           } else if (obj[prop] instanceof Date) {
             rv += '&' + encodeURIComponent(qname) + '=' + obj[prop].getTime();
@@ -483,12 +515,14 @@
             } else{
               rv += '&' + util.toQueryString(obj[prop], qname);
             }
+
           // Output non-object
           } else {
             rv += '&' + encodeURIComponent(qname) + '=' + encodeURIComponent( obj[prop] );
           }
         }
       }
+
       return rv.replace(/^&/,'');
     }
   };
@@ -550,7 +584,7 @@
     var hasCookies = (typeof document === "object" && typeof document.cookie === "string") ? true : false;
 
     return {
-      persist:function(){
+      persist: function() {
         var value = {};
         if(this.applicationSecret){ value.applicationSecret = this.applicationSecret; }
         if(this.accessToken){ value.accessToken = this.accessToken; }
@@ -561,17 +595,17 @@
           cookie.set(this.key, value);
         }
       },
-      restore: function(){
+      restore: function() {
         var storedSession = {};
-        if(this.preferLocalStorage && hasLocalStorage){
+        if(this.preferLocalStorage && hasLocalStorage) {
           storedSession = localStorage.get(this.key);
         } else if (hasCookies) {
           storedSession = cookie.get(this.key);
         }
         util.mixin(this, storedSession);
       },
-      destroy: function(){
-        if(this.preferLocalStorage && hasLocalStorage){
+      destroy: function() {
+        if(this.preferLocalStorage && hasLocalStorage) {
           localStorage.erase(this.key);
         } else if (hasCookies) {
           cookie.erase(this.key);

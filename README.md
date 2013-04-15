@@ -85,7 +85,7 @@ If you do not want to run tests from the command line just open up `spec/specrun
 
 ## Building
 
-Make sure you have all the testing dependancies installed then run `grunt` from the command line. If the files lints and passes all the tests it will be concatinated and minified to the `dist` folder.
+Make sure you have all the testing dependancies installed then run `grunt` from the command line. If the files lints and passes all the tests it will be concatenated and minified to the `dist` folder.
 
 ## Todos
 
