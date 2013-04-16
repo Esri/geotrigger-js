@@ -26,19 +26,19 @@ post "/location/update" do
 end
 
 get "/error" do
-  { 
+  {
     error: {
       type: "static_error",
-      message: "this is a generic error message"    
+      message: "this is a generic error message"
     }
   }.to_json
 end
 
 post "/error" do
-  { 
+  {
     error: {
       type: "static_error",
-      message: "this is a generic error message"    
+      message: "this is a generic error message"
     }
   }.to_json
 end

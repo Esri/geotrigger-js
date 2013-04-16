@@ -15,22 +15,22 @@ module.exports = function(grunt) {
     },
     concat: {
       dist: {
-        src: ['<banner:meta.banner>', 'src/Geotriggers.js'],
-        dest: 'dist/Geotriggers.min.js'
+        src: ['<banner:meta.banner>', 'src/geotriggers.js'],
+        dest: 'dist/geotriggers.min.js'
       },
       version: {
-        src: ['<banner:meta.banner>', 'src/Geotriggers.js'],
-        dest: 'versions/Geotriggers-<%= meta.version %>.min.js'
+        src: ['<banner:meta.banner>', 'src/geotriggers.js'],
+        dest: 'versions/geotriggers-<%= meta.version %>.min.js'
       }
     },
     min: {
       dist: {
         src: ['<banner:meta.banner>', '<config:concat.dist.dest>'],
-        dest: 'dist/Geotriggers.min.js'
+        dest: 'dist/geotriggers.min.js'
       },
       version: {
-        src: ['<banner:meta.banner>', 'src/Geotriggers.js'],
-        dest: 'versions/Geotriggers-<%= meta.version %>.min.js'
+        src: ['<banner:meta.banner>', 'src/geotriggers.js'],
+        dest: 'versions/geotriggers-<%= meta.version %>.min.js'
       }
     },
     watch: {
@@ -66,13 +66,14 @@ module.exports = function(grunt) {
     uglify: {},
     jasmine: {
       all: {
-        src:['spec/SpecRunner.html'],
+        src:['spec/specrunner.html'],
         errorReporting: true,
         timeout: 20000
       }
     },
     jasmine_node: {
-      spec: "./spec/spec/GeoloqiSpec.js",
+      specNameMatcher: "-spec",
+      specFolders: ["./spec/spec"],
       projectRoot: ".",
       requirejs: false,
       forceExit: true,
