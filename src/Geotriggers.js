@@ -22,7 +22,7 @@
   -----------------------------------
   */
   var version        = "0.0.1";
-  var geotriggersUrl = "https://geotriggersdev.arcgis.com";
+  var geotriggersUrl = "http://geotriggersdev.arcgis.com/";
   var tokenUrl = "https://devext.arcgis.com/sharing/oauth2/token";
   var registerDeviceUrl = "https://devext.arcgis.com/sharing/oauth2/registerDevice";
   var exports = {};
@@ -114,7 +114,7 @@
       this.log("Geotriggers.Session : attempting to restore saved session");
       session.restore.call(this);
     }
-
+    console.log("POST RESTORE", this);
     // if there is an access token and it is after when the token expires or there is no access token or an access_token and no refresh token
     if((this.accessToken && (Date.now() > new Date(this.expiresOn).getTime())) || !this.accessToken){
       this.log("accessToken does not exist or has expired");
@@ -123,6 +123,7 @@
   }
 
   Session.prototype.get = function(method, options){
+    options =  options || {};
     options.type = "GET";
     options.method = method;
     return makeRequest.call(this, options);
@@ -139,8 +140,10 @@
     session.destroy.call(this);
   };
   Session.prototype.runQueue = function(){
+    console.log(this._requestQueue);
     for (var i = 0; i < this._requestQueue.length; i++) {
       var request = this._requestQueue[i];
+      this.log("Geotriggers Session : running request", request);
       makeRequest.call(this, request.options, request.deferred);
     }
   };
@@ -158,7 +161,8 @@
       }).then(util.bind(this, function(response){
         this.accessToken = response.access_token;
         this.expiresOn = new Date(new Date().getTime() + ((response.expires_in-(60*5)) *1000));
-      }), util.bind(this, this._authError)).then(util.bind(this, this._processAuth));
+        this._processAuth();
+      }), util.bind(this, this._authError));
 
     // if we have a refresh token lets use it to get a new token
     } else if (this.refreshToken){
@@ -174,7 +178,8 @@
         this.accessToken = response.access_token;
         this.refreshToken = response.refresh_token;
         this.expiresOn = new Date(new Date().getTime() + ((response.expires_in-(60*5)) *1000));
-      }), util.bind(this, this._authError)).then(util.bind(this, this._processAuth));
+        this._processAuth();
+      }), util.bind(this, this._authError));
 
     // else register a new device
     } else {
@@ -189,7 +194,8 @@
         this.accessToken = response.deviceToken.access_token;
         this.refreshToken = response.deviceToken.refresh_token;
         this.expiresOn = new Date(new Date().getTime() + ((response.deviceToken.expires_in-(60*5)) *1000));
-      }), util.bind(this, this._authError)).then(util.bind(this, this._processAuth));
+        this._processAuth(response);
+      }), util.bind(this, this._authError));
     }
 
   };
@@ -232,11 +238,12 @@
   Session.prototype._processAuth = function(response){
     session.persist.call(this);
     this.runQueue();
-    this.emit("authentication:success");
-    this.emit("authenticated");
+    this.emit("authentication:success", response);
+    this.emit("authenticated", response);
   };
   Session.prototype._authError = function(error){
-    this.emit("authentication:failure");
+    this.log("Geotriggers Session : Error authenticating with ArcGIS Portal - " + error.error_description);
+    this.emit("authentication:failure", error);
   };
   Session.prototype.log = function(){
     var args = Array.prototype.slice.apply(arguments);
@@ -252,11 +259,10 @@
   -----------------------------------
   */
   function makeRequest(options, dfd) {
-    this.log("Geotriggers.Session : starting request");
+    this.log("Geotriggers.Session : starting request to", options);
 
     // make a new deferred for callbacks
     var deferred = new exports.Deferred() || dfd;
-
     // if we are not authenticated yet save these options and deferred for later
     if(!this.authenticated() && !options.authCall){
       this.log("Geotriggers.Session : not authenticated queueing request");
@@ -264,6 +270,7 @@
         deferred: deferred,
         options: options
       });
+      console.log(this._requestQueue);
       return deferred;
     }
 
@@ -280,12 +287,13 @@
 
     //merge settings and defaults
     var settings = util.merge(defaults, options);
-    this.log("Geotriggers.Session : mergeing request defaults and ");
+    this.log("Geotriggers.Session : mergeing request defaults and passed options");
+    console.log(settings);
     // assume this is a request to getriggers is it doesnt start with (http|https)://
-    var geotriggersRequest = settings.method.match(/^https?:\/\//);
+    var geotriggersRequest = !settings.method.match(/^https?:\/\//);
 
     // create the url for the request
-    var url = (geotriggersRequest) ? settings.method : this.geotriggersUrl + "/" + settings.method;
+    var url = (geotriggersRequest) ? this.geotriggersUrl + settings.method : settings.method;
 
     // if the user supplied a callback and the callback has NOT been applied to the deferred
     if(settings.callback && options.addCallbacksToDeferred) {
@@ -298,6 +306,8 @@
 
     // callback for handling a successful request
     var handleSuccessfulResponse = function(){
+      console.log("SUCCESS");
+      if(httpRequest.responseText){
       var json = JSON.parse(httpRequest.responseText);
       var response = (json.error) ? null : json;
       var error = (json.error) ? json.error : null;
@@ -305,7 +315,7 @@
       // did our token expire?
       // if it didn't resolve or reject the callback
       // if it did refresh the auth and run the request again
-      if(error && error.type === "expired_token"){
+      if(error && error.type == "invalidHeader" && error.headers.Authorization.type === "invalid"){
         // dont add the settings.callback function to the deferred next time around;
         options.addCallbacksToDeferred = false;
         // push our request options and deferred into the request queue
@@ -331,16 +341,18 @@
           });
         }
       }
+      }
     };
 
     // callback for handling an http error
     var handleErrorResponse = function(){
+      console.log("ERROR");
+      console.log(httpRequest.responseText);
       var error = {
         type: "http_error",
-        message: "your request could not be completed"
+        message: httpRequest.responseText
       };
       deferred.reject(error);
-      events.fire("request:end");
     };
 
     // callback for handling state change
@@ -372,21 +384,24 @@
     // Convert parameters to form vars for transport
     var queryString = util.toQueryString(settings.params);
 
-    // is we are authenticated and this is a geotriggers request and this is not and authCall
-    if(this.authenticated() && geotriggersRequest && !options.authCall){
-      httpRequest.setRequestHeader('Authentication', 'Bearer '+ this.accessToken);
-    }
-
     // make the request
     switch (settings.type) {
       case "GET":
         httpRequest.open("GET", url + "?" + queryString);
+        // is we are authenticated and this is a geotriggers request and this is not and authCall
+        if(this.authenticated() && geotriggersRequest && !options.authCall){
+          httpRequest.setRequestHeader('Authorization', 'Bearer '+ this.accessToken);
+        }
         httpRequest.send(null);
         break;
       case "POST":
         httpRequest.open("POST", url);
         if(httpRequest instanceof XMLHttpRequest){
           httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        }
+        // is we are authenticated and this is a geotriggers request and this is not and authCall
+        if(this.authenticated() && geotriggersRequest && !options.authCall){
+          httpRequest.setRequestHeader('Authorization', 'Bearer '+ this.accessToken);
         }
         httpRequest.send(queryString);
         break;
@@ -555,6 +570,7 @@
         if(this.applicationSecret){ value.applicationSecret = this.applicationSecret; }
         if(this.accessToken){ value.accessToken = this.accessToken; }
         if(this.refreshToken){ value.refreshToken = this.refreshToken; }
+        if(this.deviceId){ value.deviceId = this.deviceId; }
         if(this.preferLocalStorage && hasLocalStorage){
           localStorage.set(this.key, value);
         } else if (hasCookies) {
@@ -562,12 +578,14 @@
         }
       },
       restore: function(){
-        var storedSession = {};
+        console.log("restore", this);
+        var storedSession;
         if(this.preferLocalStorage && hasLocalStorage){
           storedSession = localStorage.get(this.key);
         } else if (hasCookies) {
           storedSession = cookie.get(this.key);
         }
+        console.log("stored", storedSession);
         util.mixin(this, storedSession);
       },
       destroy: function(){

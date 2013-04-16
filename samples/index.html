@@ -5,9 +5,21 @@
     <script src="../src/Geotriggers.js"></script>
     <script>
       geotriggers = new Geotriggers.Session({
-        applicationId: "b08f1f8cde6c4bb8b84d356d23a0e19e",
-        debug: true
+        applicationId: "0y7X3Af0WS1CRONB",
+        //applicationSecret: "c748ee76473f44c4a4ac78e3a804069b",
+        debug: true,
+        //persistSession: false
       });
+
+      if(geotriggers.deviceId){
+        geotriggers.get("device/list", {
+          params: {
+            deviceIds: [geotriggers.deviceId]
+          }
+        }).then(function (response) {
+          console.log("DEVICES", response);
+        });
+      }
     </script>
   </head>
   <body>
