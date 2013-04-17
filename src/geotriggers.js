@@ -254,9 +254,7 @@
     }
   };
   Session.prototype.request = function(options, dfd){
-    var session = this;
-
-    // set defaults for parameters, callback, XHR, and toggles
+    // set defaults for parameters, callback, XHR
     var defaults = {
       parameters: {},
       callback: null,
