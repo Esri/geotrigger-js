@@ -303,7 +303,7 @@
       // did our token expire?
       // if it didn't resolve or reject the callback
       // if it did refresh the auth and run the request again
-      if(error && error.type == "invalidHeader" && error.headers.Authorization){
+      if(error && error.type === "invalidHeader" && error.headers.Authorization){
         // dont add the settings.callback function to the deferred next time around;
         options.addCallbacksToDeferred = false;
         // push our request options and deferred into the request queue
