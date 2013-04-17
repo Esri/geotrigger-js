@@ -112,7 +112,11 @@
     if(options.session) {
       util.mixin(this, options.session);
     } else if(this.persistSession) {
-      session.restore.call(this);
+      if(this.preferLocalStorage && hasLocalStorage){
+        util.mixin(this, localStorage.get(this.key));
+      } else if (hasCookies) {
+        util.mixin(this, cookie.get(this.key));
+      }
     }
 
     // if there is an access token and it is after when the token expires or there is no access token or an access_token and no refresh token
@@ -234,7 +238,7 @@
   };
   Session.prototype._processAuth = function(response){
     if(this.persistSession){
-      session.persist.call(this);
+      this.persist();
     }
     this.runQueue();
     this.emit("authentication:success", response);
@@ -277,8 +281,6 @@
 
     // merge settings and defaults
     var settings = util.merge(defaults, options);
-
-    console.log(defaults, options, settings);
 
     // assume this is a request to getriggers is it doesnt start with (http|https)://
     var geotriggersRequest = !settings.method.match(/^https?:\/\//);
@@ -395,6 +397,25 @@
 
     // return the deferred
     return deferred;
+  };
+  Session.prototype.persist = function() {
+    var value = {};
+    if(this.applicationSecret){ value.applicationSecret = this.applicationSecret; }
+    if(this.accessToken){ value.accessToken = this.accessToken; }
+    if(this.refreshToken){ value.refreshToken = this.refreshToken; }
+    if(this.deviceId){ value.deviceId = this.deviceId; }
+    if(this.preferLocalStorage && hasLocalStorage){
+      localStorage.set(this.key, value);
+    } else if (hasCookies) {
+      cookie.set(this.key, value);
+    }
+  };
+  Session.prototype.destroy = function() {
+    if(this.preferLocalStorage && hasLocalStorage) {
+      localStorage.erase(this.key);
+    } else if (hasCookies) {
+      cookie.erase(this.key);
+    }
   };
 
   exports.Session = Session;
@@ -525,88 +546,53 @@
   -----------------------------------
   */
 
-  var session = (function(){
-    var s = {};
+  var hasLocalStorage = (typeof window === "object" && typeof window.localStorage === "object") ? true : false;
+  var hasCookies = (typeof document === "object" && typeof document.cookie === "string") ? true : false;
 
-    var localStorage = {
-      set:function(key, value){
-        window.localStorage.setItem(key, JSON.stringify(value));
-      },
-      get: function(key){
-        return JSON.parse(window.localStorage.getItem(key));
-      },
-      erase: function(key){
-        window.localStorage.removeItem(key);
+  var localStorage = {
+    set:function(key, value){
+      window.localStorage.setItem(key, JSON.stringify(value));
+    },
+    get: function(key){
+      return JSON.parse(window.localStorage.getItem(key));
+    },
+    erase: function(key){
+      window.localStorage.removeItem(key);
+    }
+  };
+
+  var cookie = {
+    get: function(key) {
+      // Still not sure that "[a-zA-Z0-9.()=|%/_]+($|;)" match *all* allowed characters in cookies
+      var tmp =  document.cookie.match((new RegExp(key +'=[a-zA-Z0-9.()=|%/_]+($|;)','g')));
+      if(!tmp || !tmp[0]){
+        return null;
+      } else {
+        return JSON.parse(tmp[0].substring(key.length+1,tmp[0].length).replace(';','')) || null;
       }
-    };
+    },
 
-    var cookie = {
-      get: function(key) {
-        // Still not sure that "[a-zA-Z0-9.()=|%/_]+($|;)" match *all* allowed characters in cookies
-        var tmp =  document.cookie.match((new RegExp(key +'=[a-zA-Z0-9.()=|%/_]+($|;)','g')));
-        if(!tmp || !tmp[0]){
-          return null;
-        } else {
-          return JSON.parse(tmp[0].substring(key.length+1,tmp[0].length).replace(';','')) || null;
-        }
-      },
+    set: function(key, value, secure) {
+      var cookie = [
+        key+'='+JSON.stringify(value),
+        'path=/',
+        'domain='+window.location.host
+      ];
 
-      set: function(key, value, secure) {
-        var cookie = [
-          key+'='+JSON.stringify(value),
-          'path=/',
-          'domain='+window.location.host
-        ];
+      var expiration_date = new Date();
+      expiration_date.setFullYear(expiration_date.getFullYear() + 1);
+      cookie.push(expiration_date.toGMTString());
 
-        var expiration_date = new Date();
-        expiration_date.setFullYear(expiration_date.getFullYear() + 1);
-        cookie.push(expiration_date.toGMTString());
-
-        if (secure){
-          cookie.push('secure');
-        }
-        return document.cookie = cookie.join('; ');
-      },
-
-      erase: function(key) {
-        document.cookie = key + "; " + new Date(0).toUTCString();
+      if (secure){
+        cookie.push('secure');
       }
-    };
+      return document.cookie = cookie.join('; ');
+    },
 
-    var hasLocalStorage = (typeof window === "object" && typeof window.localStorage === "object") ? true : false;
-    var hasCookies = (typeof document === "object" && typeof document.cookie === "string") ? true : false;
-
-    return {
-      persist: function() {
-        var value = {};
-        if(this.applicationSecret){ value.applicationSecret = this.applicationSecret; }
-        if(this.accessToken){ value.accessToken = this.accessToken; }
-        if(this.refreshToken){ value.refreshToken = this.refreshToken; }
-        if(this.deviceId){ value.deviceId = this.deviceId; }
-        if(this.preferLocalStorage && hasLocalStorage){
-          localStorage.set(this.key, value);
-        } else if (hasCookies) {
-          cookie.set(this.key, value);
-        }
-      },
-      restore: function(){
-        var storedSession;
-        if(this.preferLocalStorage && hasLocalStorage){
-          storedSession = localStorage.get(this.key);
-        } else if (hasCookies) {
-          storedSession = cookie.get(this.key);
-        }
-        util.mixin(this, storedSession);
-      },
-      destroy: function() {
-        if(this.preferLocalStorage && hasLocalStorage) {
-          localStorage.erase(this.key);
-        } else if (hasCookies) {
-          cookie.erase(this.key);
-        }
-      }
-    };
-  }());
+    erase: function(key) {
+      document.cookie = key + "; " + new Date(0).toUTCString();
+    }
+  };
 
   return exports;
 }));
