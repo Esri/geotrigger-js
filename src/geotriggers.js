@@ -102,38 +102,41 @@
       throw new Error("Geotriggers.Session requires an `applicationId` or a `session` parameter.");
     }
 
-    // mixin defaults and options into `this`
-    util.mixin(this, util.merge(defaults, options));
+    // merge defaults and options into `this`
+    util.merge(this, util.merge(defaults, options));
 
     this.authenticatedAs = (this.applicationId && this.applicationSecret) ? "application" : "device";
     this.key = "_geotriggers_" + this.authenticatedAs + "_" + this.applicationId;
 
-    // restore an old session from a passed object (node) or a persisted session (browser)
-    if(options.session) {
-      util.mixin(this, options.session);
-    } else if(this.persistSession) {
+    //restore a stored session if we have one
+    if(this.persistSession) {
       if(this.preferLocalStorage && hasLocalStorage){
-        util.mixin(this, localStorage.get(this.key));
+        util.merge(this, localStorage.get(this.key));
       } else if (hasCookies) {
-        util.mixin(this, cookie.get(this.key));
+        util.merge(this, cookie.get(this.key));
       }
     }
 
-    // if there is an access token and it is after when the token expires or there is no access token or an access_token and no refresh token
+    // restore an old session from a passed object
+    if(options.session) {
+      util.merge(this, options.session);
+    }
+
+    // if there is an access token and it is after when the token expires or there is no access token
     if((this.accessToken && (Date.now() > new Date(this.expiresOn).getTime())) || !this.accessToken){
       this.refresh();
     }
   }
 
   Session.prototype.get = function(method, options){
-    var options = options || {};
+    options = options || {};
     options.type = "GET";
     options.method = method;
     options.returnXHR = false;
     return this.request(options);
   };
   Session.prototype.post = function(method, options){
-    var options =  options || {};
+    options =  options || {};
     options.type = "POST";
     options.method = method;
     options.returnXHR = false;
@@ -142,7 +145,7 @@
   Session.prototype.authenticated = function(){
     return !!this.accessToken;
   };
-  Session.prototype.runQueue = function(){
+  Session.prototype._runQueue = function(){
     for (var i = 0; i < this._requestQueue.length; i++) {
       var request = this._requestQueue[i];
       this.request(request.options, request.deferred);
@@ -157,8 +160,7 @@
           client_secret: this.applicationSecret,
           f: "json",
           grant_type: "client_credentials"
-        },
-        authCall: true
+        }
       }).then(util.bind(this, function(response){
         this.accessToken = response.access_token;
         this.expiresOn = new Date(new Date().getTime() + ((response.expires_in-(60*5)) *1000));
@@ -173,8 +175,7 @@
           refresh_token: this.refreshToken,
           f: "json",
           grant_type: "refresh_token"
-        },
-        authCall: true
+        }
       }).then(util.bind(this, function(response){
         this.accessToken = response.access_token;
         this.refreshToken = response.refresh_token;
@@ -188,8 +189,7 @@
         params: {
           client_id: this.applicationId,
           f: "json"
-        },
-        authCall: true
+        }
       }).then(util.bind(this, function(response){
         this.deviceId = response.device.deviceId;
         this.accessToken = response.deviceToken.access_token;
@@ -198,7 +198,6 @@
         this._processAuth(response);
       }), util.bind(this, this._authError));
     }
-
   };
   Session.prototype.toJSON = function(){
     var obj = {};
@@ -240,12 +239,12 @@
     if(this.persistSession){
       this.persist();
     }
-    this.runQueue();
+    this._runQueue();
     this.emit("authentication:success", response);
     this.emit("authenticated", response);
   };
   Session.prototype._authError = function(error){
-    this.log("Geotriggers.Session : Error authenticating with ArcGIS Portal - " + error.error_description);
+    this.log("Geotriggers.Session : Error getting token from ArcGIS Portal - " + error.error_description);
     this.emit("authentication:failure", error);
   };
   Session.prototype.log = function(){
@@ -257,21 +256,6 @@
   Session.prototype.request = function(options, dfd){
     var session = this;
 
-    // make a new deferred for callbacks
-    var deferred = new exports.Deferred() || dfd;
-
-    // if we are not authenticated yet save these options and deferred for later
-    if(!this.authenticated() && !options.authCall){
-      this._requestQueue.push({
-        deferred: deferred,
-        options: options
-      });
-      return deferred;
-    }
-
-    // empty var for httpRequest which is set later
-    var httpRequest;
-
     // set defaults for parameters, callback, XHR, and toggles
     var defaults = {
       parameters: {},
@@ -279,11 +263,26 @@
       returnXHR: true
     };
 
+    // make a new deferred for callbacks
+    var deferred = new exports.Deferred() || dfd;
+
+    // empty var for httpRequest which is set later
+    var httpRequest;
+
     // merge settings and defaults
     var settings = util.merge(defaults, options);
 
     // assume this is a request to getriggers is it doesnt start with (http|https)://
     var geotriggersRequest = !settings.method.match(/^https?:\/\//);
+
+    // if we are not authenticated yet save these options and deferred for later
+    if(!this.authenticated() && geotriggersRequest){
+      this._requestQueue.push({
+        deferred: deferred,
+        options: options
+      });
+      return deferred;
+    }
 
     // create the url for the request
     var url = (geotriggersRequest) ? this.geotriggersUrl + settings.method : settings.method;
@@ -376,8 +375,8 @@
     switch (settings.type) {
       case "GET":
         httpRequest.open("GET", url + "?" + queryString);
-        // is we are authenticated and this is a geotriggers request and this is not and authCall
-        if(this.authenticated() && geotriggersRequest && !options.authCall){
+        // is we are authenticated and this is a geotriggers request
+        if(geotriggersRequest){
           httpRequest.setRequestHeader('Authorization', 'Bearer '+ this.accessToken);
         }
         httpRequest.send(null);
@@ -387,8 +386,8 @@
         if(httpRequest instanceof XMLHttpRequest){
           httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         }
-        // is we are authenticated and this is a geotriggers request and this is not and authCall
-        if(this.authenticated() && geotriggersRequest && !options.authCall){
+        // is we are authenticated and this is a geotriggers request
+        if(geotriggersRequest){
           httpRequest.setRequestHeader('Authorization', 'Bearer '+ this.accessToken);
         }
         httpRequest.send(queryString);
@@ -460,34 +459,17 @@
 
     // Merge Object 1 and Object 2.
     // Properties from Object 2 will override properties in Object 1.
-    merge: function(obj1, obj2){
-      var obj3 = {};
-
-      for (var obj1attr in obj1) {
-        if(obj1.hasOwnProperty(obj1attr)){
-          obj3[obj1attr] = obj1[obj1attr];
+    // Returns Object 1
+    merge: function(target, obj){
+      for (var attr in obj) {
+        if(obj.hasOwnProperty(attr)){
+          target[attr] = obj[attr];
         }
       }
-
-      for (var obj2attr in obj2) {
-        if(obj2.hasOwnProperty(obj2attr)){
-          obj3[obj2attr] = obj2[obj2attr];
-        }
-      }
-
-      return obj3;
-    },
-
-    mixin: function(target, mixin){
-      for (var attr in mixin) {
-        if(mixin.hasOwnProperty(attr)){
-          target[attr] = mixin[attr];
-        }
-      }
-
       return target;
     },
 
+    // Makes it safe to log from anywhere
     log: function(){
       var args = Array.prototype.slice.apply(arguments);
       if (typeof console !== undefined && console.log) {
@@ -495,6 +477,7 @@
       }
     },
 
+    // Converts and object to a query string
     toQueryString: function(obj, parentObject) {
       if( typeof obj !== 'object' ) {
         return '';
