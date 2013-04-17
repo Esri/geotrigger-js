@@ -1,4 +1,8 @@
-# The new geoloqi.js library.
+# geotriggers.js
+
+A lightweight, dependency-free library for interacting with the Geotriggers platform.
+
+## Features
 
 * CORS Support
 * No Dependancies
@@ -7,18 +11,9 @@
 * IE 8 and 9 support
 * AMD and Node.js support
 
-# Node Tests
-If you want to run the node tests just `npm test`
+## Methods
 
-# Browser Tests
-
-Testing is done via [Grunt](http://gruntjs.com/) and [Phantom JS](http://phantomjs.org/). To install these just run...
-
-If you want to run the tests in a browser with `grunt` or `grunt jasmine` you will need to install Phantom JS and grunt.
-
-* `npm install grunt -g`
-* `brew install phantomjs`
-
+<<<<<<< HEAD:Readme.md
 Once these are installed you can now run the tests with `grunt jasmine`.
 
 If you do not want to run tests from the command line just open up `spec/SpecRunner.html` in your browser.
@@ -33,8 +28,9 @@ Make sure you have all the testing dependancies installed then run `grunt` from 
 * Batching and deferred lists
 * Socket helpers (socket.io and native websockets)
 
-```js
+# Examples
 
+```js
 // Will look for a cookie or localstorage entry to restore a session from
 // if this cannot find a previous session this will make a new session by
 // calling registerDevice and persist it.
@@ -97,6 +93,12 @@ geotriggers = new Geotriggers.Session({
 // Store this JSON object somewhere and pass it as the `session`
 // parameter with your initalize your `Geotriggers.Session`
 geotriggers.toJSON()
+
+// when you need to reinitialize a session make a new session and
+// pass the stored JSON in.
+geotriggers = new Geotriggers.Session({
+  session: storedJson
+});
 ```
 
 # Using with a refresh token and access token
@@ -118,3 +120,30 @@ If you don't have an access_token the Geotriggers SDK will automatically registe
 
 This will get you an `access_token` and `refresh_token` for the new device. If `persistSession` is true this session will
 be persisted and reloaded on everypage load so anoter device will not be created.
+
+## Node Tests
+
+If you want to run the node tests just `npm test`
+
+## Browser Tests
+
+Testing is done via [Grunt](http://gruntjs.com/) and [Phantom JS](http://phantomjs.org/). To install these just run...
+
+If you want to run the tests in a browser with `grunt` or `grunt jasmine` you will need to install Phantom JS and grunt.
+
+* `npm install grunt -g`
+* `brew install phantomjs`
+
+Once these are installed you can now run the tests with `grunt jasmine`.
+
+If you do not want to run tests from the command line just open up `spec/specrunner.html` in your browser.
+
+## Building
+
+Make sure you have all the testing dependancies installed then run `grunt` from the command line. If the files lints and passes all the tests it will be concatenated and minified to the `dist` folder.
+
+## Todos
+
+* HTML5 Geolocation Helpers
+* Batching and deferred lists
+* Socket helpers (socket.io and native websockets)

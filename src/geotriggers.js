@@ -21,18 +21,18 @@
   Configuration Variables
   -----------------------------------
   */
-  var version        = "0.0.1";
-  var geotriggersUrl = "http://geotriggersdev.arcgis.com/";
-  var tokenUrl = "https://devext.arcgis.com/sharing/oauth2/token";
+  var version           = "0.0.1";
+  var geotriggersUrl    = "http://geotriggersdev.arcgis.com/";
+  var tokenUrl          = "https://devext.arcgis.com/sharing/oauth2/token";
   var registerDeviceUrl = "https://devext.arcgis.com/sharing/oauth2/registerDevice";
-  var exports = {};
+  var exports           = {};
 
   /*
   Custom Deferred Callbacks.
   -----------------------------------
   */
 
-  Deferred = function Deferred() {
+  var Deferred = function Deferred() {
     this._thens = [];
   };
 
@@ -43,11 +43,11 @@
       return this;
     },
     success: function(onResolve){
-      this._thens.push({ resolve: onResolve });
+      this.then(onResolve);
       return this;
     },
     error: function(onReject){
-      this._thens.push({ reject: onReject });
+      this.then(null, onReject);
       return this;
     },
     resolve: function (val) {
@@ -85,6 +85,7 @@
   function Session(options){
     this._requestQueue = [];
     this._events = {};
+
     var defaults = {
       session: {},
       preferLocalStorage: true,
@@ -92,59 +93,55 @@
       geotriggersUrl: geotriggersUrl,
       tokenUrl: tokenUrl,
       registerDeviceUrl: registerDeviceUrl,
-      debug: false
+      debug: false,
+      automaticRegistation: true
     };
 
-    // set applicaiton id
+    // set application id
     if(!options.applicationId && !options.session) {
-      throw new Error("Geotriggers.Session requires an `applicationId` or a `session`.");
+      throw new Error("Geotriggers.Session requires an `applicationId` or a `session` parameter.");
     }
 
     // mixin defaults and options into `this`
     util.mixin(this, util.merge(defaults, options));
 
-    this.authenticatedAs = (this.applicationId && this.applicationSecret) ? "applicaiton" : "device";
+    this.authenticatedAs = (this.applicationId && this.applicationSecret) ? "application" : "device";
     this.key = "_geotriggers_" + this.authenticatedAs + "_" + this.applicationId;
 
     // restore an old session from a passed object (node) or a persisted session (browser)
     if(options.session) {
-      this.log("Geotriggers.Session : mixing in passed session");
       util.mixin(this, options.session);
     } else if(this.persistSession) {
-      this.log("Geotriggers.Session : attempting to restore saved session");
       session.restore.call(this);
     }
-    console.log("POST RESTORE", this);
+
     // if there is an access token and it is after when the token expires or there is no access token or an access_token and no refresh token
     if((this.accessToken && (Date.now() > new Date(this.expiresOn).getTime())) || !this.accessToken){
-      this.log("accessToken does not exist or has expired");
       this.refresh();
     }
   }
 
   Session.prototype.get = function(method, options){
-    options =  options || {};
+    var options = options || {};
     options.type = "GET";
     options.method = method;
-    return makeRequest.call(this, options);
+    options.returnXHR = false;
+    return this.request(options);
   };
   Session.prototype.post = function(method, options){
+    var options =  options || {};
     options.type = "POST";
     options.method = method;
-    return makeRequest.call(this, options);
+    options.returnXHR = false;
+    return this.request(options);
   };
   Session.prototype.authenticated = function(){
     return !!this.accessToken;
   };
-  Session.prototype.destroy = function(){
-    session.destroy.call(this);
-  };
   Session.prototype.runQueue = function(){
-    console.log(this._requestQueue);
     for (var i = 0; i < this._requestQueue.length; i++) {
       var request = this._requestQueue[i];
-      this.log("Geotriggers Session : running request", request);
-      makeRequest.call(this, request.options, request.deferred);
+      this.request(request.options, request.deferred);
     }
   };
   Session.prototype.refresh = function(){
@@ -182,7 +179,7 @@
       }), util.bind(this, this._authError));
 
     // else register a new device
-    } else {
+    } else if (this.automaticRegistation) {
       this.post(this.registerDeviceUrl, {
         params: {
           client_id: this.applicationId,
@@ -236,13 +233,15 @@
     }
   };
   Session.prototype._processAuth = function(response){
-    session.persist.call(this);
+    if(this.persistSession){
+      session.persist.call(this);
+    }
     this.runQueue();
     this.emit("authentication:success", response);
     this.emit("authenticated", response);
   };
   Session.prototype._authError = function(error){
-    this.log("Geotriggers Session : Error authenticating with ArcGIS Portal - " + error.error_description);
+    this.log("Geotriggers.Session : Error authenticating with ArcGIS Portal - " + error.error_description);
     this.emit("authentication:failure", error);
   };
   Session.prototype.log = function(){
@@ -251,26 +250,18 @@
       util.log.apply(this, args);
     }
   };
-
-  exports.Session = Session;
-
-  /*
-  Makes AJAX Requests
-  -----------------------------------
-  */
-  function makeRequest(options, dfd) {
-    this.log("Geotriggers.Session : starting request to", options);
+  Session.prototype.request = function(options, dfd){
+    var session = this;
 
     // make a new deferred for callbacks
     var deferred = new exports.Deferred() || dfd;
+
     // if we are not authenticated yet save these options and deferred for later
     if(!this.authenticated() && !options.authCall){
-      this.log("Geotriggers.Session : not authenticated queueing request");
       this._requestQueue.push({
         deferred: deferred,
         options: options
       });
-      console.log(this._requestQueue);
       return deferred;
     }
 
@@ -281,14 +272,14 @@
     var defaults = {
       parameters: {},
       callback: null,
-      returnXHR: false,
-      addCallbacksToDeferred: true
+      returnXHR: true
     };
 
-    //merge settings and defaults
+    // merge settings and defaults
     var settings = util.merge(defaults, options);
-    this.log("Geotriggers.Session : mergeing request defaults and passed options");
-    console.log(settings);
+
+    console.log(defaults, options, settings);
+
     // assume this is a request to getriggers is it doesnt start with (http|https)://
     var geotriggersRequest = !settings.method.match(/^https?:\/\//);
 
@@ -296,7 +287,7 @@
     var url = (geotriggersRequest) ? this.geotriggersUrl + settings.method : settings.method;
 
     // if the user supplied a callback and the callback has NOT been applied to the deferred
-    if(settings.callback && options.addCallbacksToDeferred) {
+    if(settings.callback) {
       deferred.then(function(result){
         settings.callback(null, result);
       }, function(error){
@@ -306,8 +297,6 @@
 
     // callback for handling a successful request
     var handleSuccessfulResponse = function(){
-      console.log("SUCCESS");
-      if(httpRequest.responseText){
       var json = JSON.parse(httpRequest.responseText);
       var response = (json.error) ? null : json;
       var error = (json.error) ? json.error : null;
@@ -315,7 +304,7 @@
       // did our token expire?
       // if it didn't resolve or reject the callback
       // if it did refresh the auth and run the request again
-      if(error && error.type == "invalidHeader" && error.headers.Authorization.type === "invalid"){
+      if(error && error.type == "invalidHeader" && error.headers.Authorization){
         // dont add the settings.callback function to the deferred next time around;
         options.addCallbacksToDeferred = false;
         // push our request options and deferred into the request queue
@@ -341,13 +330,10 @@
           });
         }
       }
-      }
     };
 
     // callback for handling an http error
     var handleErrorResponse = function(){
-      console.log("ERROR");
-      console.log(httpRequest.responseText);
       var error = {
         type: "http_error",
         message: httpRequest.responseText
@@ -409,7 +395,9 @@
 
     // return the deferred
     return deferred;
-  }
+  };
+
+  exports.Session = Session;
 
   /*
   General Purpose Utilities
@@ -419,61 +407,82 @@
   var util = {
     bind: function(context, func) {
       var bound, args;
-      if (typeof func !== "function") throw new TypeError();
-      if (typeof Function.prototype.bind == 'function') return func.bind(context);
+
+      if (typeof func !== "function") {
+        throw new TypeError();
+      }
+
+      if (typeof Function.prototype.bind === 'function') {
+        return func.bind(context);
+      }
+
       args = Array.prototype.slice.call(arguments, 2);
+
       return bound = function() {
-        if (!(this instanceof bound)) return func.apply(context, args.concat(Array.prototype.slice.call(arguments)));
-        ctor.prototype = func.prototype;
-        var self = new ctor();
+        if (!(this instanceof bound)) {
+          return func.apply(context, args.concat(Array.prototype.slice.call(arguments)));
+        }
+
+        var Ctor;
+        Ctor.prototype = func.prototype;
+
+        var self = new Ctor();
         var result = func.apply(self, args.concat(Array.prototype.slice.call(arguments)));
-        if (Object(result) === result) return result;
+
+        if (Object(result) === result) {
+          return result;
+        }
+
         return self;
       };
     },
-    /* Merge Object 1 and Object 2. Properties from Object 2 will override properties in Ojbect 1 */
+
+    // Merge Object 1 and Object 2.
+    // Properties from Object 2 will override properties in Object 1.
     merge: function(obj1, obj2){
       var obj3 = {};
+
       for (var obj1attr in obj1) {
         if(obj1.hasOwnProperty(obj1attr)){
           obj3[obj1attr] = obj1[obj1attr];
         }
       }
+
       for (var obj2attr in obj2) {
         if(obj2.hasOwnProperty(obj2attr)){
           obj3[obj2attr] = obj2[obj2attr];
         }
       }
+
       return obj3;
     },
+
     mixin: function(target, mixin){
       for (var attr in mixin) {
         if(mixin.hasOwnProperty(attr)){
           target[attr] = mixin[attr];
         }
       }
+
       return target;
     },
-    s4: function(){
-      return Math.floor(Math.random() * 0x10000).toString(16);
-    },
-    guid: function(){
-      return (util.S4() + util.S4() + "-" + util.S4() + "-" + util.S4() + "-" + util.S4() + "-" + util.S4() + util.S4() + util.S4());
-    },
+
     log: function(){
       var args = Array.prototype.slice.apply(arguments);
       if (typeof console !== undefined && console.log) {
         console.log.apply(console, args);
       }
     },
+
     toQueryString: function(obj, parentObject) {
-      if( typeof obj !== 'object' ){
+      if( typeof obj !== 'object' ) {
         return '';
       }
+
       var rv = '';
+
       for(var prop in obj) {
         if (obj.hasOwnProperty(prop)) {
-
           var qname = (parentObject) ? parentObject + '.' + prop : prop;
 
           // Expand Arrays
@@ -485,6 +494,7 @@
                 rv += '&' + encodeURIComponent(qname) + '=' + encodeURIComponent( obj[prop][i] );
               }
             }
+
           // Expand Dates
           } else if (obj[prop] instanceof Date) {
             rv += '&' + encodeURIComponent(qname) + '=' + obj[prop].getTime();
@@ -498,12 +508,14 @@
             } else{
               rv += '&' + util.toQueryString(obj[prop], qname);
             }
+
           // Output non-object
           } else {
             rv += '&' + encodeURIComponent(qname) + '=' + encodeURIComponent( obj[prop] );
           }
         }
       }
+
       return rv.replace(/^&/,'');
     }
   };
@@ -565,7 +577,7 @@
     var hasCookies = (typeof document === "object" && typeof document.cookie === "string") ? true : false;
 
     return {
-      persist:function(){
+      persist: function() {
         var value = {};
         if(this.applicationSecret){ value.applicationSecret = this.applicationSecret; }
         if(this.accessToken){ value.accessToken = this.accessToken; }
@@ -578,18 +590,16 @@
         }
       },
       restore: function(){
-        console.log("restore", this);
         var storedSession;
         if(this.preferLocalStorage && hasLocalStorage){
           storedSession = localStorage.get(this.key);
         } else if (hasCookies) {
           storedSession = cookie.get(this.key);
         }
-        console.log("stored", storedSession);
         util.mixin(this, storedSession);
       },
-      destroy: function(){
-        if(this.preferLocalStorage && hasLocalStorage){
+      destroy: function() {
+        if(this.preferLocalStorage && hasLocalStorage) {
           localStorage.erase(this.key);
         } else if (hasCookies) {
           cookie.erase(this.key);

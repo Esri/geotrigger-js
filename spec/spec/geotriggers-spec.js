@@ -14,18 +14,18 @@ beforeEach(function() {
       test = array2;
     }
 
-    // loop over the shorter array and make sure the coorestponding key in the longer array matches
+    // loop over the shorter array and make sure the corresponding key in the longer array matches
     for(var key in ref) {
       if(typeof ref[key] === typeof test[key]) {
 
-       // if the keys represent an object make sure that it matches.
+       // if the keys represent an object make sure that it matches
         if(typeof ref[key] === "object" && typeof test[key] === "object") {
           if(!objectSignaturesMatch(ref[key], test[key])){
             return false;
           }
         }
 
-        // if the keys represent an array make sure it matches
+        // if the keys represent an array make sure that it matches
         if(typeof ref[key] === "array" && typeof test[key] === "array") {
           if(!arrySignaturesMatch(ref[key],test[key])){
             return false;
@@ -37,10 +37,10 @@ beforeEach(function() {
     return true;
   }
 
-  // do the keys in object1 match object 2?
+  // do the keys in object 1 match object 2?
   function objectSignaturesMatch(object1, object2){
 
-    // becuase typeof null is object we need to check for it here before Object.keys
+    // because typeof null is object we need to check for it here before Object.keys
     if(object1 === null && object2 === null){
       return true;
     }
@@ -114,12 +114,12 @@ beforeEach(function() {
       return true;
     },
 
-    // this expects an objec to loosly match another objects signature
+    // this expects an object to loosely match another object's signature
     objectToLooselyMatch: function(obj){
       return objectSignaturesMatch(this.actual, obj);
     },
 
-    // this expects an array to loosly match another objects signature
+    // this expects an array to loosely match another object's signature
     arrayToLooselyMatch: function(arr){
       return arrySignaturesMatch(this.actual, arr);
     },
@@ -146,7 +146,7 @@ beforeEach(function() {
 });
 
 if(typeof module === "object" && !Geotriggers){
-  var Geotriggers = require("../../src/Geotriggers");
+  var Geotriggers = require("../../src/geotriggers");
 }
 
 describe("custom spec helpers", function(){
@@ -235,7 +235,7 @@ describe("custom spec helpers", function(){
   });
 });
 
-describe("Geotriggers.js", function() {
+describe("geotriggers.js", function() {
 
   it("should throw an error if initialized without an application_id", function(){
     expect(function(){
