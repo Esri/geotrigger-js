@@ -57,7 +57,6 @@
       this._complete('reject', ex);
     },
     _complete: function (which, arg) {
-      console.log(which, arg, this._thens);
       // switch over to sync then()
       this.then = (which === 'resolve') ?
         function (resolve, reject) { resolve(arg); } :
@@ -161,8 +160,10 @@
     }
   };
   Session.prototype.refresh = function(){
+    this.log("refrehsing session");
     // if we have an application secret just request a new token
     if(this.applicationSecret){
+      this.log("getting new application token");
       this.post(this.tokenUrl, {
         params: {
           client_id: this.applicationId,
@@ -178,6 +179,7 @@
 
     // if we have a refresh token lets use it to get a new token
     } else if (this.refreshToken){
+      this.log("getting new device token with a refresh token");
       this.post(this.tokenUrl, {
         params: {
           client_id: this.applicationId,
@@ -194,6 +196,7 @@
 
     // else register a new device
     } else if (this.automaticRegistation) {
+      this.log("no applicaitonSecret or refreshToken, registering a new device");
       this.post(this.registerDeviceUrl, {
         params: {
           client_id: this.applicationId,
@@ -248,12 +251,13 @@
     if(this.persistSession){
       this.persist();
     }
+    this.log("session refreshed running queue");
     this._runQueue();
     this.emit("authentication:success", response);
     this.emit("authenticated", response);
   };
   Session.prototype._authError = function(error){
-    this.log("Geotriggers.Session : Error getting token from ArcGIS Portal - " + error.error_description);
+    this.log("error getting token or registering device from ArcGIS, " + error.error_description);
     this.emit("authentication:failure", error);
   };
   Session.prototype.log = function(){
@@ -263,6 +267,8 @@
     }
   };
   Session.prototype.request = function(options, dfd){
+    var session = this;
+
     // set defaults for parameters, callback, XHR
     var defaults = {
       params: {},
@@ -282,8 +288,12 @@
     // assume this is a request to getriggers is it doesnt start with (http|https)://
     var geotriggersRequest = !settings.method.match(/^https?:\/\//);
 
+    // create the url for the request
+    var url = (geotriggersRequest) ? this.geotriggersUrl + settings.method : settings.method;
+
     // if we are not authenticated yet save these options and deferred for later
     if(!this.authenticated() && geotriggersRequest){
+      this.log("not authenticated for request to "+ url + " as a " + this.authenticatedAs + " refreshing session and queuing request");
       this._requestQueue.push({
         deferred: deferred,
         options: options
@@ -291,8 +301,7 @@
       return deferred;
     }
 
-    // create the url for the request
-    var url = (geotriggersRequest) ? this.geotriggersUrl + settings.method : settings.method;
+    this.log("making request to " + url + " as a " + this.authenticatedAs);
 
     // if the user supplied a callback and the callback has NOT been applied to the deferred
     if(settings.callback) {
@@ -305,6 +314,7 @@
 
     // callback for handling a successful request
     var handleSuccessfulResponse = function(){
+      session.log("successful http request to " + url + " as a " + session.authenticatedAs);
       var json = JSON.parse(httpRequest.responseText);
       var response = (json.error) ? null : json;
       var error = (json.error) ? json.error : null;
@@ -316,36 +326,43 @@
         // dont add the settings.callback function to the deferred next time around;
         options.addCallbacksToDeferred = false;
         // push our request options and deferred into the request queue
-        this._requestQueue.push({
+        session._requestQueue.push({
           options: options,
           deferred: deferred
         });
         // refresh the auth
-        this.refresh();
+        session.refresh();
       } else {
         if(settings.returnXHR && !error){
+          session.log("running success callback for request to " + url + " with ", httpRequest);
           deferred.resolve(httpRequest);
         } else if (settings.returnXHR && error){
+          session.log("running error callback for request to " + url + " with ", httpRequest);
           deferred.reject(httpRequest);
         } else if (!error){
-          console.log("resp", response);
+          session.log("running success callback for request to " + url + " with ", response);
           deferred.resolve(response);
         } else if (error){
+          session.log("running error callback for request to " + url + " with ", response);
           deferred.reject(error);
         } else {
-          deferred.reject({
+          var errorMessage = {
             type: "unexpected_response",
             message: "the api returned a non json or unexpected data"
-          });
+          };
+          session.log("running error callback for request to " + url + " with ", errorMessage);
+          deferred.reject(errorMessage);
         }
       }
     };
 
     // callback for handling an http error
     var handleErrorResponse = function(){
+      var errorMessage = JSON.parse(httpRequest.responseText);
+      session.log("request to " + url + " as a " + session.authenticatedAs + " failed with ", errorMessage);
       var error = {
         type: "http_error",
-        message: JSON.parse(httpRequest.responseText)
+        message: errorMessage
       };
       deferred.reject(error);
     };
@@ -388,6 +405,7 @@
           httpRequest.setRequestHeader('Authorization', 'Bearer '+ this.accessToken);
         }
         httpRequest.send(null);
+        this.log("sent GET request to "+ url + " as a " + this.authenticatedAs + " with", settings.params);
         break;
       case "POST":
         httpRequest.open("POST", url);
@@ -399,6 +417,7 @@
           httpRequest.setRequestHeader('Authorization', 'Bearer '+ this.accessToken);
         }
         httpRequest.send(queryString);
+        this.log("sent POST request to "+ url + " as a " + this.authenticatedAs + " with", settings.params);
         break;
     }
 
@@ -412,12 +431,15 @@
     if(this.refreshToken){ value.refreshToken = this.refreshToken; }
     if(this.deviceId){ value.deviceId = this.deviceId; }
     if(this.preferLocalStorage && hasLocalStorage){
+      this.log("persisting session to localStorage ", value);
       localStorage.set(this.key, value);
     } else if (hasCookies) {
+      this.log("persisting session to cookie ", value);
       cookie.set(this.key, value);
     }
   };
   Session.prototype.destroy = function() {
+    this.log("destorying persisted session");
     if(this.preferLocalStorage && hasLocalStorage) {
       localStorage.erase(this.key);
     } else if (hasCookies) {

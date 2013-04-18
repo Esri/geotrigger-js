@@ -2,8 +2,8 @@ if(typeof module === "object" && !Geotriggers){
   var Geotriggers = require("../../src/geotriggers");
 }
 
-var ApplicationId = "XXX";
-var ApplicationSecret = "XXX";
+var ApplicationId = "MpwWGenqaSCMSMii";
+var ApplicationSecret = "520b13154c0f474caa6f5193a1aa122f";
 
 describe("geotriggers.js", function() {
 
@@ -63,7 +63,8 @@ describe("geotriggers.js", function() {
   describe("api request methods", function(){
     var geotriggers = new Geotriggers.Session({
       applicationId: ApplicationId,
-      persistSession: false
+      persistSession: false,
+      debug: true
     });
 
     it("should make a GET request with a callback", function(){

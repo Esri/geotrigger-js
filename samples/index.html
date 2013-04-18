@@ -7,14 +7,11 @@
       var ApplicationId = "0y7X3Af0WS1CRONB";
       var ApplicationSecret = "c748ee76473f44c4a4ac78e3a804069b";
 
-      var spy = function(response){
-        console.log(response);
-      };
-
       var geotriggers = new Geotriggers.Session({
         applicationId: ApplicationId,
         //applicationSecret: ApplicationSecret,
-        persistSession: false
+        persistSession: false,
+        debug: true
       });
 
       geotriggers.post("device/update",{
@@ -30,8 +27,6 @@
           console.log(response);
         });
       });
-
-      console.log(geotriggers._requestQueue);
 
     </script>
   </head>
