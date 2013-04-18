@@ -57,13 +57,22 @@
       this._complete('reject', ex);
     },
     _complete: function (which, arg) {
+      console.log(which, arg, this._thens);
       // switch over to sync then()
       this.then = (which === 'resolve') ?
         function (resolve, reject) { resolve(arg); } :
         function (resolve, reject) { reject(arg); };
+      this.success = function(resolve){
+        resolve(arg);
+      };
+      this.error = function(reject){
+        reject(arg);
+      };
       // disallow multiple calls to resolve or reject
-      this.resolve = this.reject =
-        function () { throw new Error('Deferred already completed.'); };
+      this.resolve = this.reject = function() {
+        throw new Error('Deferred already completed.');
+      };
+
       // complete all waiting (async) then()s
       for (var i = 0; i < this._thens.length; i++) {
         var aThen = this._thens[i];
@@ -89,7 +98,7 @@
     var defaults = {
       session: {},
       preferLocalStorage: true,
-      persistSession: true,
+      persistSession: (typeof module !== 'undefined' && module.exports) ? false : true,
       geotriggersUrl: geotriggersUrl,
       tokenUrl: tokenUrl,
       registerDeviceUrl: registerDeviceUrl,
@@ -256,13 +265,13 @@
   Session.prototype.request = function(options, dfd){
     // set defaults for parameters, callback, XHR
     var defaults = {
-      parameters: {},
+      params: {},
       callback: null,
       returnXHR: true
     };
 
     // make a new deferred for callbacks
-    var deferred = new exports.Deferred() || dfd;
+    var deferred = dfd || new exports.Deferred();
 
     // empty var for httpRequest which is set later
     var httpRequest;
@@ -319,6 +328,7 @@
         } else if (settings.returnXHR && error){
           deferred.reject(httpRequest);
         } else if (!error){
+          console.log("resp", response);
           deferred.resolve(response);
         } else if (error){
           deferred.reject(error);
@@ -335,7 +345,7 @@
     var handleErrorResponse = function(){
       var error = {
         type: "http_error",
-        message: httpRequest.responseText
+        message: JSON.parse(httpRequest.responseText)
       };
       deferred.reject(error);
     };
@@ -367,7 +377,7 @@
     }
 
     // Convert parameters to form vars for transport
-    var queryString = util.toQueryString(settings.params);
+    var queryString = util.serialize(settings.params);
 
     // make the request
     switch (settings.type) {
@@ -473,6 +483,38 @@
       if (typeof console !== undefined && console.log) {
         console.log.apply(console, args);
       }
+    },
+
+    isObject: function(thing){
+      return Object.prototype.toString.call(thing) === '[object Object]';
+    },
+
+    isArray: function(thing){
+      return Object.prototype.toString.call(thing) === '[object Array]';
+    },
+
+
+    serialize: function(obj, prefix) {
+
+        var enc = encodeURIComponent;
+
+        // make an array to hold each peice
+        var str = [];
+
+        // for every key in our object
+        for(var p in obj) {
+          var e;
+          var k = (prefix) ? prefix + "[" + p + "]" : p, v = obj[p];
+          if(k === "properties"){
+            e = enc(k) + "=" + enc(JSON.stringify(v));
+          } else {
+            e = (util.isObject(v)) ? util.serialize(v, k) : enc(k) + "=" + enc(v);
+          }
+          str.push(e);
+        }
+
+        // join with ampersands
+        return str.join("&");
     },
 
     // Converts and object to a query string
