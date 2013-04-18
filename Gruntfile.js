@@ -35,9 +35,8 @@ module.exports = function(grunt) {
     uglify: {
       options: {
         banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %>\n' +
-        '*   https://github.com/geoloqi/geoloqi-js-2\n' +
         '*   Copyright (c) <%= grunt.template.today("yyyy") %> Environmental Systems Research Institute, Inc.\n' +
-        '*   Licensed MIT\n' +
+        '*   Apache License' +
         '*/\n\n'
       },
       dist: {
