@@ -2,174 +2,166 @@ if(typeof module === "object" && !Geotriggers){
   var Geotriggers = require("../../src/geotriggers");
 }
 
+var ApplicationId = "XXX";
+var ApplicationSecret = "XXX";
+
 describe("geotriggers.js", function() {
 
-  it("should throw an error if initialized without an application_id", function(){
+  it("should throw an error if initialized without an application_id or session", function(){
     expect(function(){
-      Geotriggers.configure({
-        device_secret: "xxx"
-      });
+      new Geotriggers.Session();
     }).toThrow();
   });
 
-  it("should throw an error if initialized with an application_secret and device_secret", function(){
-    expect(function(){
-      Geotriggers.configure({
-        application_id: "xxx",
-        application_secret: "xxx",
-        device_secret: "xxx"
+  it("should fire an `authenticated` event after the initializes successfully with an application id and secret", function(){
+    var spy = jasmine.createSpy();
+    var geotriggers;
+
+    runs(function(){
+      geotriggers = new Geotriggers.Session({
+        applicationId: ApplicationId,
+        applicationSecret: ApplicationSecret,
+        persistSession: false
       });
-    }).toThrow();
-  });
 
-  it("should fire an `init` event after the initializes successfully", function(){
-    var callback = jasmine.createSpy();
-
-    Geotriggers.configure({
-      application_id: "xxx",
-      application_secret: "xxx"
+      geotriggers.on("authenticated", spy);
     });
 
-    expect(callback).toHaveBeenCalled();
+    waitsFor(function(){
+      return geotriggers.authenticated();
+    }, "Did not auth", 3000);
 
-    this.after(function(){
-      Geotriggers.destory();
+    runs(function(){
+      expect(spy).toHaveBeenCalled();
+      expect(geotriggers.authenticated()).toBeTruthy();
     });
   });
 
-  it("should return true if there is a application_id and application_secret in auth", function(){
-    Geotriggers.configure({
-      application_id: "xxx",
-      application_secret: "xxx"
+  it("should fire an `authenticated` event after the initializes successfully with an application id", function(){
+    var spy = jasmine.createSpy();
+    var geotriggers;
+
+    runs(function(){
+      geotriggers = new Geotriggers.Session({
+        applicationId: ApplicationId,
+        persistSession: false
+      });
+
+      geotriggers.on("authenticated", spy);
     });
 
-    expect(Geotriggers.authenticated()).toBeTruthy();
+    waitsFor(function(){
+      return geotriggers.authenticated();
+    }, "Did not auth", 3000);
 
-    this.after(function(){
-      Geotriggers.destory();
+    runs(function(){
+      expect(spy).toHaveBeenCalled();
+      expect(geotriggers.authenticated()).toBeTruthy();
     });
-  });
-
-  it("should return true if there is a application_id and device_secret in auth", function(){
-    Geotriggers.configure({
-      application_id: "xxx",
-      device_secret: "xxx"
-    });
-
-    expect(Geotriggers.authenticated()).toBeTruthy();
-
-    this.after(function(){
-      Geotriggers.destory();
-    });
-  });
-
-  it("should return false if there is not a valid application_id and a device_secret or application_secret", function(){
-    expect(Geotriggers.authenticated()).toBeFalsy();
   });
 
   describe("api request methods", function(){
-
-    beforeEach(function(){
-      Geotriggers.configure({
-        application_id: "xxx",
-        application_secret: "xxx"
-      });
+    var geotriggers = new Geotriggers.Session({
+      applicationId: ApplicationId,
+      persistSession: false
     });
 
     it("should make a GET request with a callback", function(){
-      var callback = jasmine.createSpy();
+      var spy = jasmine.createSpy();
 
       runs(function(){
-        Geotriggers.get("location/last").then(callback);
+        geotriggers.get("device/list",{}).success(spy);
       });
 
       waitsFor(function(){
-        return callback.callCount;
-      }, "GET request timed out", 2000);
+        return spy.callCount;
+      }, "Did not make request for device/list", 3000);
 
       runs(function(){
-        expect(callback).toHaveBeenCalledWithArgsLike({
-          latitude: 45,
-          longitude: 45
-        }, null);
+        expect(spy).toHaveBeenCalledWithArgsLike({
+          devices: [{
+            deviceId: "xxx",
+            deviceSecret: null,
+            createdOn: "date",
+            tags: ["deviceTag"],
+            updatedAt: null
+          }],
+          envelope: null
+        });
       });
     });
 
     it("should make a POST request with a callback", function(){
-      var callback = jasmine.createSpy();
+      var spy = jasmine.createSpy();
 
       runs(function(){
-        Geotriggers.post("location/update", {
-          latitude:  45,
-          longitude: 45
-        }).then(callback);
+        geotriggers.post("device/update",{
+          params: {
+            addTags: ["foo"],
+            properties: {
+              foo: "bar"
+            }
+          }
+        }).success(spy);
       });
 
       waitsFor(function(){
-        return callback.callCount;
-      }, "POST request timed out", 2000);
+        return spy.callCount;
+      }, "Did not make request for device/update", 3000);
 
       runs(function(){
-        expect(callback).toHaveBeenCalledWithArgsLike({
-          application_id: "xxx",
-          application_secret: "xxx",
-          latitude:  45,
-          longitude: 45
-        }, null);
+        expect(spy).toHaveBeenCalledWithArgsLike({
+          devices: [{
+            deviceId: "xxx",
+            tags: ["deviceTag"],
+            trackingProfile: null,
+            lastSeen: "date"
+          }]
+        });
       });
     });
 
     it("should make a GET request and use an xhr object in the callback", function(){
-      var callback = jasmine.createSpy();
+      var spy = jasmine.createSpy();
 
       runs(function(){
-        Geotriggers.request("GET", "location/last").then(callback);
+        geotriggers.request({
+          type: "GET",
+          method: "device/list"
+        }).then(spy);
       });
 
       waitsFor(function(){
-        return callback.callCount;
+        return spy.callCount;
       }, "GET request timed out", 2000);
 
       runs(function(){
-        expect(callback.mostRecentCall.args[0] instanceof XMLHttpRequest);
+        expect(spy.mostRecentCall.args[0] instanceof XMLHttpRequest);
       });
     });
 
     it("should make a POST request and use an xhr object in the callback", function(){
-      var callback = jasmine.createSpy();
+      var spy = jasmine.createSpy();
 
       runs(function(){
-        Geotriggers.request("POST", "location/update", {
-          latitude:  45,
-          longitude: 45
-        }, callback);
+        geotriggers.request({
+          method: "device/update",
+          type: "POST",
+          params: {
+            addTags: ["foo"],
+            properties: {
+              foo: "bar"
+            }
+          }
+        }).success(spy);
       });
 
       waitsFor(function(){
-        return callback.callCount;
-      }, "POST request timed out", 2000);
+        return spy.callCount;
+      }, "Did not make request for device/update", 3000);
 
       runs(function(){
-        expect(callback.mostRecentCall.args[0] instanceof XMLHttpRequest);
-      });
-    });
-
-    it("should make a successful request with no parameters", function(){
-      var callback = jasmine.createSpy();
-
-      runs(function(){
-        Geotriggers.get("location/last", callback);
-      });
-
-      waitsFor(function(){
-        return callback.callCount;
-      }, "GET request timed out", 2000);
-
-      runs(function(){
-        expect(callback).toHaveBeenCalledWithArgsLike({
-          latitude: 45,
-          longitude: 45
-        }, null);
+        expect(spy.mostRecentCall.args[0] instanceof XMLHttpRequest);
       });
     });
 
