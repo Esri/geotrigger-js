@@ -4,19 +4,30 @@
     <title>Sample</title>
     <script src="../src/geotriggers.js"></script>
     <script>
-      geotriggers = new Geotriggers.Session({
-        applicationId: "0y7X3Af0WS1CRONB",
-        applicationSecret: "c748ee76473f44c4a4ac78e3a804069b",
+      var ApplicationId = "0y7X3Af0WS1CRONB";
+      var ApplicationSecret = "c748ee76473f44c4a4ac78e3a804069b";
+
+      var geotriggers = new Geotriggers.Session({
+        applicationId: ApplicationId,
+        //applicationSecret: ApplicationSecret,
+        persistSession: false,
         debug: true
       });
 
-      geotriggers.get("trigger/list", {
+      geotriggers.post("device/update",{
         params: {
-          tags: ["test"]
+          addTags: ["foo", "bar"],
+          properties: {
+            foo: "bar"
+          }
         }
-      }).success(function(response) {
+      }).then(function(response){
         console.log(response);
+        geotriggers.get("device/list").success(function(response){
+          console.log(response);
+        });
       });
+
     </script>
   </head>
   <body>
