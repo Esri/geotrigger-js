@@ -262,6 +262,7 @@
   };
   Session.prototype.log = function(){
     var args = Array.prototype.slice.apply(arguments);
+    args.unshift(this.key);
     if(this.debug){
       util.log.apply(this, args);
     }
