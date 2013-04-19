@@ -14,19 +14,26 @@
         debug: true
       });
 
-      geotriggers.post("device/update",{
-        params: {
-          addTags: ["foo", "bar"],
-          properties: {
-            foo: "bar"
+        geotriggers.post("location/update", {
+          params: {
+            locations: [{
+              "timestamp": "2012-05-09T16:03:53-0700",
+              "planet":    "earth",
+              "latitude":  45.51294827744629,
+              "longitude": -122.66232132911682,
+              "accuracy":  10.0,
+              "speed":     null,
+              "altitude":  0,
+              "bearing":   null,
+              "verticalAccuracy": null,
+              "properties": {}
+            }]
           }
-        }
-      }).then(function(response){
-        console.log(response);
-        geotriggers.get("device/list").success(function(response){
+        }).then(function(response){
+          console.log(response);
+        },function(response){
           console.log(response);
         });
-      });
 
     </script>
   </head>

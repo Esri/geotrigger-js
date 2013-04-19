@@ -188,5 +188,40 @@ describe("geotriggers.js", function() {
       });
     });
 
+    it("should be able to update location", function(){
+      var successSpy = jasmine.createSpy("success");
+      var errorSpy = jasmine.createSpy("error");
+
+      runs(function(){
+        geotriggers.request({
+          method: "location/update",
+          type: "POST",
+          params: {
+            locations: [{
+              "timestamp": "2012-05-09T16:03:53-0700",
+              "planet":    "earth",
+              "latitude":  45.51294827744629,
+              "longitude": -122.66232132911682,
+              "accuracy":  10.0,
+              "speed":     null,
+              "altitude":  0,
+              "bearing":   null,
+              "verticalAccuracy": null,
+              "properties": {}
+            }]
+          }
+        }).then(successSpy, errorSpy);
+      });
+
+      waitsFor(function(){
+        return successSpy.callCount || errorSpy.callCount;
+      }, "Did not run at least one callback", 3000);
+
+      runs(function(){
+        expect(errorSpy).not.toHaveBeenCalled();
+        expect(successSpy).toHaveBeenCalled();
+      });
+    });
+
   });
 });
