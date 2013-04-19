@@ -223,5 +223,42 @@ describe("geotriggers.js", function() {
       });
     });
 
+    it("should be able to update location", function(){
+      var successSpy = jasmine.createSpy("success");
+      var errorSpy = jasmine.createSpy("error");
+
+      runs(function(){
+        geotriggers.request({
+          method: "trigger/create",
+          type: "POST",
+          params: {
+            condition: {
+              direction: "enter",
+              geo:  {
+                geojson: {
+                  type: "Polygon",
+                  coordinates: [
+                    [ [-122.65, 45.55], [-122.65, 45.50], [-122.62, 45.50], [-122.62, 45.55], [-122.65, 45.55] ]
+                  ]
+                }
+              }
+            },
+            action: {
+              message: "At some random polygon in portland"
+            }
+          }
+        }).then(successSpy, errorSpy);
+      });
+
+      waitsFor(function(){
+        return successSpy.callCount || errorSpy.callCount;
+      }, "Did not run at least one callback", 3000);
+
+      runs(function(){
+        expect(errorSpy).not.toHaveBeenCalled();
+        expect(successSpy).toHaveBeenCalled();
+      });
+    });
+
   });
 });

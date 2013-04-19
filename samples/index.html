@@ -14,27 +14,28 @@
         debug: true
       });
 
-        geotriggers.post("location/update", {
-          params: {
-            locations: [{
-              "timestamp": "2012-05-09T16:03:53-0700",
-              "planet":    "earth",
-              "latitude":  45.51294827744629,
-              "longitude": -122.66232132911682,
-              "accuracy":  10.0,
-              "speed":     null,
-              "altitude":  0,
-              "bearing":   null,
-              "verticalAccuracy": null,
-              "properties": {}
-            }]
+      geotriggers.post("trigger/create", {
+        params: {
+          condition: {
+            direction: "enter",
+            geo:  {
+              geojson: {
+                type: "Polygon",
+                coordinates: [
+                  [ [-122.65, 45.55], [-122.65, 45.50], [-122.62, 45.50], [-122.62, 45.55], [-122.65, 45.55] ]
+                ]
+              }
+            }
+          },
+          action: {
+            message: "At some random polygon in portland"
           }
-        }).then(function(response){
-          console.log(response);
-        },function(response){
-          console.log(response);
-        });
-
+        }
+      }).then(function(response){
+        console.log(response);
+      },function(response){
+        console.log(response);
+      });
     </script>
   </head>
   <body>
