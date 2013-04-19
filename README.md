@@ -24,6 +24,7 @@ geotriggers = new Geotriggers.Session({
   registerUrl: "https://devext.arcgis.com/sharing/oauth2/registerDevice", // optional - url to register device endpoint
   automaticRegistation: true // optional - when true this will automatically register a device with ArcGIS Online to get a token
 });
+```
 
 # Request Options
 
