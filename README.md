@@ -128,6 +128,41 @@ geotriggers = new Geotriggers.Session({
 });
 ```
 
+## Using with Node
+
+By default the `persistSession` flag is set to false in node to prevent the library from attempting to persist the session to a cookie or localStorage. You should use the `geotriggers.toJSON()` method to create a JSON object to persist and restore a saved session by passing your stored session later.
+
+```js
+var Geotriggers = require("geotriggers");
+
+var geotriggers = new Geotriggers.Session({
+  applicationId: "XXX"
+});
+
+// store this somewhere
+var sessionInfo = geotriggers.toJSON();
+
+// restore the session later
+var geotriggers = new Geotriggers.Session({
+  session: sessionInfo,
+  applicationId: "XXX"
+});
+```
+
+## Using with AMD
+
+You can also use geotriggers js as an AMD module. This is useful for frameworks and libraries that use AMD like require.js and dojo.
+
+```js
+require([
+  "geotriggers.js"
+], function(Geotriggers){
+  var geotriggers = new Geotriggers.Session({
+    applicationId: "XXX"
+  });
+})
+```
+
 # Anonymous usage
 
 If you don't have an `access_token` the Geotriggers SDK will automatically register an anonymous device with ArcGIS Online.
@@ -158,38 +193,3 @@ Make sure you have all the testing dependancies installed then run `grunt` from 
 
 * HTML5 geolocation helpers for `location/update`
 * Batching and deferred lists
-
-### Using with Node
-
-By default the `persistSession` flag is set to false in node to prevent the library from attempting to persist the session to a cookie or localStorage. You should use the `geotriggers.toJSON()` method to create a JSON object to persist and restore a saved session by passing your stored session later.
-
-```js
-var Geotriggers = require("geotriggers");
-
-var geotriggers = new Geotriggers.Session({
-  applicationId: "XXX"
-});
-
-// store this somewhere
-var sessionInfo = geotriggers.toJSON();
-
-// restore the session later
-var geotriggers = new Geotriggers.Session({
-  session: sessionInfo,
-  applicationId: "XXX"
-});
-```
-
-### Using with AMD
-
-You can also use geotriggers js as an AMD module. This is useful for frameworks and libraries that use AMD like require.js and dojo.
-
-```js
-require([
-  "geotriggers.js"
-], function(Geotriggers){
-  var geotriggers = new Geotriggers.Session({
-    applicationId: "XXX"
-  });
-})
-```
