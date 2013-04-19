@@ -14,20 +14,28 @@
         debug: true
       });
 
-      geotriggers.post("device/update",{
+      geotriggers.post("trigger/create", {
         params: {
-          addTags: ["foo", "bar"],
-          properties: {
-            foo: "bar"
+          condition: {
+            direction: "enter",
+            geo:  {
+              geojson: {
+                type: "Polygon",
+                coordinates: [
+                  [ [-122.65, 45.55], [-122.65, 45.50], [-122.62, 45.50], [-122.62, 45.55], [-122.65, 45.55] ]
+                ]
+              }
+            }
+          },
+          action: {
+            message: "At some random polygon in portland"
           }
         }
       }).then(function(response){
         console.log(response);
-        geotriggers.get("device/list").success(function(response){
-          console.log(response);
-        });
+      },function(response){
+        console.log(response);
       });
-
     </script>
   </head>
   <body>
