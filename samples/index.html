@@ -9,26 +9,17 @@
 
       var geotriggers = new Geotriggers.Session({
         applicationId: ApplicationId,
-        //applicationSecret: ApplicationSecret,
+        applicationSecret: ApplicationSecret,
         persistSession: false,
         debug: true
       });
 
-      geotriggers.post("trigger/create", {
+      geotriggers.post("device/message", {
         params: {
-          condition: {
-            direction: "enter",
-            geo:  {
-              geojson: {
-                type: "Polygon",
-                coordinates: [
-                  [ [-122.65, 45.55], [-122.65, 45.50], [-122.62, 45.50], [-122.62, 45.55], [-122.65, 45.55] ]
-                ]
-              }
-            }
-          },
-          action: {
-            message: "At some random polygon in portland"
+          tags: ["portland"],
+          text: "baz",
+          data: {
+            foo: "bar"
           }
         }
       }).then(function(response){
