@@ -63,8 +63,7 @@ describe("geotriggers.js", function() {
   describe("api request methods", function(){
     var geotriggers = new Geotriggers.Session({
       applicationId: ApplicationId,
-      persistSession: false,
-      debug: true
+      persistSession: false
     });
 
     it("should make a GET request with a callback", function(){
@@ -86,8 +85,7 @@ describe("geotriggers.js", function() {
             createdOn: "date",
             tags: ["deviceTag"],
             updatedAt: null
-          }],
-          envelope: null
+          }]
         });
       });
     });
@@ -163,6 +161,30 @@ describe("geotriggers.js", function() {
 
       runs(function(){
         expect(spy.mostRecentCall.args[0] instanceof XMLHttpRequest);
+      });
+    });
+
+    it("should chain deferreds", function(){
+      var spy1 = jasmine.createSpy();
+      var spy2 = jasmine.createSpy();
+
+      runs(function(){
+        geotriggers.request({
+          method: "device/update",
+          type: "POST",
+          params: {
+            addTags: ["test"]
+          }
+        }).then(spy1).success(spy2);
+      });
+
+      waitsFor(function(){
+        return spy1.callCount || spy2.callCount;
+      }, "Did not run at least one callback", 3000);
+
+      runs(function(){
+        expect(spy1).toHaveBeenCalled();
+        expect(spy2).toHaveBeenCalled();
       });
     });
 
