@@ -19,9 +19,6 @@ geotriggers = new Geotriggers.Session({
   applicationSecret: "XXX", // optional - this will authenticate as your application with full permissions
   persistSession: true, // optional - will attempt to persist the session and reload it on future page loads
   preferLocalStorage: true, // if localstorage is available persist the session to local storage
-  geotriggersUrl: "https://geotriggersdev.arcgis.com", // optional - the url to geotriggers
-  tokenUrl: "https://devext.arcgis.com/sharing/oauth2/token", // optional - the url to the token endpoint
-  registerUrl: "https://devext.arcgis.com/sharing/oauth2/registerDevice", // optional - url to register device endpoint
   automaticRegistation: true // optional - when true this will automatically register a device with ArcGIS Online to get a token
 });
 ```
