@@ -63,8 +63,7 @@ describe("geotriggers.js", function() {
   describe("api request methods", function(){
     var geotriggers = new Geotriggers.Session({
       applicationId: ApplicationId,
-      persistSession: false,
-      debug: true
+      persistSession: false
     });
 
     it("should make a GET request with a callback", function(){
@@ -86,8 +85,7 @@ describe("geotriggers.js", function() {
             createdOn: "date",
             tags: ["deviceTag"],
             updatedAt: null
-          }],
-          envelope: null
+          }]
         });
       });
     });
@@ -163,6 +161,102 @@ describe("geotriggers.js", function() {
 
       runs(function(){
         expect(spy.mostRecentCall.args[0] instanceof XMLHttpRequest);
+      });
+    });
+
+    it("should chain deferreds", function(){
+      var spy1 = jasmine.createSpy();
+      var spy2 = jasmine.createSpy();
+
+      runs(function(){
+        geotriggers.request({
+          method: "device/update",
+          type: "POST",
+          params: {
+            addTags: ["test"]
+          }
+        }).then(spy1).success(spy2);
+      });
+
+      waitsFor(function(){
+        return spy1.callCount || spy2.callCount;
+      }, "Did not run at least one callback", 3000);
+
+      runs(function(){
+        expect(spy1).toHaveBeenCalled();
+        expect(spy2).toHaveBeenCalled();
+      });
+    });
+
+    it("should be able to update location", function(){
+      var successSpy = jasmine.createSpy("success");
+      var errorSpy = jasmine.createSpy("error");
+
+      runs(function(){
+        geotriggers.request({
+          method: "location/update",
+          type: "POST",
+          params: {
+            locations: [{
+              "timestamp": "2012-05-09T16:03:53-0700",
+              "planet":    "earth",
+              "latitude":  45.51294827744629,
+              "longitude": -122.66232132911682,
+              "accuracy":  10.0,
+              "speed":     null,
+              "altitude":  0,
+              "bearing":   null,
+              "verticalAccuracy": null,
+              "properties": {}
+            }]
+          }
+        }).then(successSpy, errorSpy);
+      });
+
+      waitsFor(function(){
+        return successSpy.callCount || errorSpy.callCount;
+      }, "Did not run at least one callback", 3000);
+
+      runs(function(){
+        expect(errorSpy).not.toHaveBeenCalled();
+        expect(successSpy).toHaveBeenCalled();
+      });
+    });
+
+    it("should be able to update location", function(){
+      var successSpy = jasmine.createSpy("success");
+      var errorSpy = jasmine.createSpy("error");
+
+      runs(function(){
+        geotriggers.request({
+          method: "trigger/create",
+          type: "POST",
+          params: {
+            condition: {
+              direction: "enter",
+              geo:  {
+                geojson: {
+                  type: "Polygon",
+                  coordinates: [
+                    [ [-122.65, 45.55], [-122.65, 45.50], [-122.62, 45.50], [-122.62, 45.55], [-122.65, 45.55] ]
+                  ]
+                }
+              }
+            },
+            action: {
+              message: "At some random polygon in portland"
+            }
+          }
+        }).then(successSpy, errorSpy);
+      });
+
+      waitsFor(function(){
+        return successSpy.callCount || errorSpy.callCount;
+      }, "Did not run at least one callback", 3000);
+
+      runs(function(){
+        expect(errorSpy).not.toHaveBeenCalled();
+        expect(successSpy).toHaveBeenCalled();
       });
     });
 

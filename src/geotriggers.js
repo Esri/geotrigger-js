@@ -528,7 +528,7 @@
         for(var p in obj) {
           var e;
           var k = (prefix) ? prefix + "[" + p + "]" : p, v = obj[p];
-          if(k === "properties"){
+          if(k === "properties" || k === "condition[geo][geojson]" || k === "locations"){
             e = enc(k) + "=" + enc(JSON.stringify(v));
           } else {
             e = (util.isObject(v)) ? util.serialize(v, k) : enc(k) + "=" + enc(v);
