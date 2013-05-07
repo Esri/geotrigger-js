@@ -4,29 +4,17 @@
     <title>Sample</title>
     <script src="../src/geotriggers.js"></script>
     <script>
-      var ApplicationId = "0y7X3Af0WS1CRONB";
-      var ApplicationSecret = "c748ee76473f44c4a4ac78e3a804069b";
+      var ApplicationId = "MpwWGenqaSCMSMii";
+      var ApplicationSecret = "520b13154c0f474caa6f5193a1aa122f";
 
       var geotriggers = new Geotriggers.Session({
         applicationId: ApplicationId,
-        applicationSecret: ApplicationSecret,
+        //applicationSecret: ApplicationSecret,
         persistSession: false,
         debug: true
       });
 
-      geotriggers.post("device/message", {
-        params: {
-          tags: ["portland"],
-          text: "baz",
-          data: {
-            foo: "bar"
-          }
-        }
-      }).then(function(response){
-        console.log(response);
-      },function(response){
-        console.log(response);
-      });
+      geotriggers.get("trigger/list");
     </script>
   </head>
   <body>
