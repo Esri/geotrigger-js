@@ -5,7 +5,7 @@ A lightweight, dependency-free library for interacting with the Geotriggers plat
 ## Features
 
 * CORS support
-* No dependancies
+* No dependencies
 * Clean, simple API
 * Handles authentication, persisting and refreshing sessions
 * AMD and Node support
@@ -77,8 +77,8 @@ geotriggers.get("trigger/list", options).success(function(response){
 This use case is ideal for single page javascript applications.
 
 ```js
-//this will create a session persisted to localstorage or cookies that be reloaded automatically every page load.
-//a new device will be registed with ArcGIS Online to get an access token
+//this will create a session persisted to localstorage or cookies that can be reloaded automatically every page load.
+//a new device will be registered with ArcGIS Online to get an access token
 geotriggers = new Geotriggers.Session({
   applicationId: "XXX", // set your application id
 });
@@ -91,8 +91,8 @@ geotrigger.get("device/list").success(function(deviceInfo){
 
 ## Using with a server
 
-If you want to store session details in a database or accosiate them with your own user data you can handle session
-persitance yourself.
+If you want to store session details in a database or associate them with your own user data you can handle session
+persistence yourself.
 
 ```js
 geotriggers = new Geotriggers.Session({
@@ -114,7 +114,7 @@ geotriggers = new Geotriggers.Session({
 
 ## Using with a refresh token and access token
 
-If you have an access token and a refresh token from another source, like your applicaitons server you can initalize the Geotriggers library with it.
+If you have an access token and a refresh token from another source, like your application's server you can initalize the Geotriggers library with it.
 
 ```js
 geotriggers = new Geotriggers.Session({
