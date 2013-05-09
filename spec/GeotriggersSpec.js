@@ -1,5 +1,5 @@
 if(typeof module === "object" && !Geotriggers){
-  var Geotriggers = require("../../src/geotriggers");
+  var Geotriggers = require("../src/geotriggers");
 }
 
 var ApplicationId = "MpwWGenqaSCMSMii";
@@ -112,7 +112,10 @@ describe("geotriggers.js", function() {
         expect(spy).toHaveBeenCalledWithArgsLike({
           devices: [{
             deviceId: "xxx",
-            tags: ["deviceTag"],
+            tags: ["deviceTag", "foo"],
+            properties: {
+              foo: "bar"
+            },
             trackingProfile: null,
             lastSeen: "date"
           }]
