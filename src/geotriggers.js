@@ -370,21 +370,17 @@
 
     // callback for handling state change
     var handleStateChange = function(){
-      if(httpRequest instanceof XMLHttpRequest && httpRequest.readyState === 4 && httpRequest.status < 400){
+      if(httpRequest.readyState === 4 && httpRequest.status < 400){
         handleSuccessfulResponse();
-      } else if(httpRequest instanceof XMLHttpRequest && httpRequest.readyState === 4 && httpRequest.status >= 400) {
+      } else if(httpRequest.readyState === 4 && httpRequest.status >= 400) {
         handleErrorResponse();
-      } else if(httpRequest instanceof XMLHttpRequest) {
-        // die and do nothing to avoid an error when we check for XDomainRequest in browsers that dont have it
-      } else if (httpRequest instanceof XDomainRequest) {
-        handleSuccessfulResponse();
       }
     };
 
     // use XDomainRequest (ie8) or XMLHttpRequest (standard)
     if (typeof XDomainRequest !== "undefined") {
       httpRequest = new XDomainRequest();
-      httpRequest.onload = handleStateChange;
+      httpRequest.onload = handleSuccessfulResponse;
       httpRequest.onerror = handleErrorResponse;
       httpRequest.ontimeout = handleErrorResponse;
     } else if (typeof XMLHttpRequest !== "undefined") {
