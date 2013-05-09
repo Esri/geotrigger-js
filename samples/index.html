@@ -14,7 +14,21 @@
         debug: true
       });
 
-      geotriggers.get("trigger/list");
+      geotriggers.post("location/update", {
+        params: {
+          locations: [
+            {
+              timestamp: (new Date()).toISOString(),
+              planet: "earth",
+              latitude: 45,
+              longitude: -122,
+              accuracy: 12,
+              speed: 15,
+              altitude: 10
+            }
+          ]
+        }
+      });
     </script>
   </head>
   <body>

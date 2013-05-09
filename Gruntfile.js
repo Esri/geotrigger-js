@@ -56,15 +56,29 @@ module.exports = function(grunt) {
         specs: 'spec/*Spec.js',
         helpers: 'spec/*Helpers.js'
       }
+    },
+    jasmine_node: {
+      options: {
+        forceExit: true,
+        match: '.',
+        matchall: false,
+        extensions: 'js',
+        specNameMatcher: '.*Spec',
+        helperNameMatcher: '.*Helpers',
+        useHelpers: true
+      },
+      all: ['spec/']
     }
   });
 
-  grunt.registerTask('default', ['jshint', 'jasmine']);
+  grunt.registerTask('default', ['jshint', 'jasmine', 'jasmine_node']);
   grunt.registerTask('build', ['default', 'uglify']);
-  grunt.registerTask('test', ['jasmine']);
+  grunt.registerTask('test', ['jasmine_node','jasmine']);
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-jasmine');
+  grunt.loadNpmTasks('grunt-jasmine-node');
+
 };
