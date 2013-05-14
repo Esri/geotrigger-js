@@ -5,7 +5,7 @@ A lightweight, dependency-free library for interacting with the Geotriggers plat
 ## Features
 
 * CORS support
-* No dependancies
+* No dependencies
 * Clean, simple API
 * Handles authentication, persisting and refreshing sessions
 * AMD and Node support
@@ -18,14 +18,12 @@ geotriggers = new Geotriggers.Session({
   applicationSecret: "XXX", // optional - this will authenticate as your application with full permissions
   persistSession: true, // optional - will attempt to persist the session and reload it on future page loads
   preferLocalStorage: true, // if localstorage is available persist the session to local storage
-  geotriggersUrl: "https://geotriggersdev.arcgis.com", // optional - the url to geotriggers
-  tokenUrl: "https://devext.arcgis.com/sharing/oauth2/token", // optional - the url to the token endpoint
-  registerUrl: "https://devext.arcgis.com/sharing/oauth2/registerDevice", // optional - url to register device endpoint
   automaticRegistation: true // optional - when true this will automatically register a device with ArcGIS Online to get a token
   token: "XXX" // if you have a token from a previous session (session.toJSON()) you can pass it in here
   refreshToken: "XXX" // if you have a refresh token from a previous session (session.toJSON()) you can pass it in here
   expiresOn: "XXX"  // if your token has an expiration date you should pass it in
 });
+```
 
 # Request Options
 
@@ -79,8 +77,8 @@ geotriggers.request("trigger/list", options).success(function(data, XHR){
 This use case is ideal for single page javascript applications.
 
 ```js
-// this will create a session persisted to localstorage or cookies that be reloaded automatically every page load.
-// a new device will be registed with ArcGIS Online to get an access token
+// this will create a session persisted to localstorage or cookies that can be reloaded automatically every page load.
+// a new device will be registered with ArcGIS Online to get an access token
 geotriggers = new Geotriggers.Session({
   applicationId: "XXX", // set your application id
 });
@@ -93,8 +91,8 @@ geotriggers.request("device/list").success(function(deviceInfo){
 
 ## Using with a server
 
-If you want to store session details in a database or accosiate them with your own user data you can handle session
-persitance yourself.
+If you want to store session details in a database or associate them with your own user data you can handle session
+persistence yourself.
 
 ```js
 geotriggers = new Geotriggers.Session({
@@ -112,7 +110,7 @@ geotriggers = new Geotriggers.Session(JSON.parse(mySession));
 
 ## Using with a refresh token and access token
 
-If you have an access token and a refresh token from another source, like your applicaitons server you can initalize the Geotriggers library with it.
+If you have an access token and a refresh token from another source, like your application's server you can initalize the Geotriggers library with it.
 
 ```js
 geotriggers = new Geotriggers.Session({
@@ -121,6 +119,41 @@ geotriggers = new Geotriggers.Session({
   refreshToken: "XXX",
   persistSession: false // dont persist the session, since you want to handle it yourself
 });
+```
+
+## Using with Node
+
+By default the `persistSession` flag is set to false in node to prevent the library from attempting to persist the session to a cookie or localStorage. You should use the `geotriggers.toJSON()` method to create a JSON object to persist and restore a saved session by passing your stored session later.
+
+```js
+var Geotriggers = require("geotriggers");
+
+var geotriggers = new Geotriggers.Session({
+  applicationId: "XXX"
+});
+
+// store this somewhere
+var sessionInfo = geotriggers.toJSON();
+
+// restore the session later
+var geotriggers = new Geotriggers.Session({
+  session: sessionInfo,
+  applicationId: "XXX"
+});
+```
+
+## Using with AMD
+
+You can also use geotriggers js as an AMD module. This is useful for frameworks and libraries that use AMD like require.js and dojo.
+
+```js
+require([
+  "geotriggers.js"
+], function(Geotriggers){
+  var geotriggers = new Geotriggers.Session({
+    applicationId: "XXX"
+  });
+})
 ```
 
 # Anonymous usage
