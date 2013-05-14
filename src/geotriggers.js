@@ -482,14 +482,6 @@
       }
     },
 
-    // Makes it safe to log from anywhere
-    warn: function(){
-      var args = Array.prototype.slice.apply(arguments);
-      if (typeof console !== undefined && console.warn) {
-        console.warn.apply(console, args);
-      }
-    },
-
     isObject: function(thing){
       return Object.prototype.toString.call(thing) === '[object Object]';
     },
