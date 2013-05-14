@@ -139,7 +139,7 @@ beforeEach(function() {
     },
 
     // expect the object to be of a certain instance
-    toBeInstanceOfClass: function(classRef){
+    toBeInstanceOf: function(classRef){
       return this.actual instanceof classRef;
     }
   });
