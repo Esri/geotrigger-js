@@ -54,7 +54,8 @@ module.exports = function(grunt) {
       src: 'src/**/*.js',
       options: {
         specs: 'spec/*Spec.js',
-        helpers: 'spec/*Helpers.js'
+        helpers: 'spec/*Helpers.js',
+        keepRunner: true
       }
     },
     jasmine_node: {

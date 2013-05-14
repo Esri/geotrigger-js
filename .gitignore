@@ -15,7 +15,7 @@ Icon
 
 # Node
 node_modules
-./grunt
+.grunt
 
 # Ruby
 *.gem

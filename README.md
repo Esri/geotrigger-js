@@ -14,41 +14,38 @@ A lightweight, dependency-free library for interacting with the Geotriggers plat
 
 ```js
 geotriggers = new Geotriggers.Session({
-  session: {}, // required or applicationId - the result of a previous geotriggers.toJSON() to restore a session.
   applicationId: "XXX", // required or session - this is the application id from developers.arcigs.com
   applicationSecret: "XXX", // optional - this will authenticate as your application with full permissions
   persistSession: true, // optional - will attempt to persist the session and reload it on future page loads
   preferLocalStorage: true, // if localstorage is available persist the session to local storage
   automaticRegistation: true // optional - when true this will automatically register a device with ArcGIS Online to get a token
+  token: "XXX" // if you have a token from a previous session (session.toJSON()) you can pass it in here
+  refreshToken: "XXX" // if you have a refresh token from a previous session (session.toJSON()) you can pass it in here
+  expiresOn: "XXX"  // if your token has an expiration date you should pass it in
 });
 ```
 
 # Request Options
 
 ```js
-geotriggers.get("trigger/list", {
+geotriggers.request("trigger/list", {
   params: {}, // the parameters object will be sent along with your request
-  callback: function(error, response){}, // a node style callback to be executed on completion
-  returnXHR: false // if true will return the instance of XMLHttpRequest in the callback or deferred insteed of the parsed JSON response
+  callback: function(error, response, XHR){}, // a node style callback to be executed on completion
 });
 ```
 
 ```js
-geotriggers.post("trigger/create", {
+geotriggers.request("trigger/create", {
   params: {}, // the parameters object will be sent along with your request
-  callback: function(error, response){}, // a node style callback to be executed on completion
-  returnXHR: false // if true will return the instance of XMLHttpRequest in the callback or deferred insteed of the parsed JSON response
+  callback: function(error, response, XHR){}, // a node style callback to be executed on completion
 });
 ```
 
 
 ```js
-geotriggers.request({
-  type: "GET", // the type of HTTP request to make
-  method: "trigger/list", // the geotriggers method to request
+geotriggers.request("location/last", {
   params: {}, // the parameters object will be sent along with your request
-  callback: function(error, response){}, // a node style callback to be executed on completion
-  returnXHR: true // if true will return the instance of XMLHttpRequest in the callback or deferred insteed of the parsed JSON response
+  callback: function(error, response, XHR){}, // a node style callback to be executed on completion
 });
 ```
 
@@ -59,13 +56,16 @@ geotriggers-js ships with its own deferred object built in. An instance of `Geot
 Standard `then(successFunction, errorFunction)` is supported as well as jQuery style `success(function)` and `error(function)`;
 
 ```js
-geotriggers.get("trigger/list", options).then(successFunction, errorFunction);
+successFunction = function(data, XHR){};
+errorFunction = function(error, XHR){};
+
+geotriggers.request("trigger/list", options).then(successFunction, errorFunction);
 ```
 
 ```js
-geotriggers.get("trigger/list", options).success(function(response){
-  //deal with the response
-}).error(function(error){
+geotriggers.request("trigger/list", options).success(function(data, XHR){
+  //deal with the data
+}).error(function(error, XHR){
   //deal with the error
 });
 ```
@@ -77,14 +77,14 @@ geotriggers.get("trigger/list", options).success(function(response){
 This use case is ideal for single page javascript applications.
 
 ```js
-//this will create a session persisted to localstorage or cookies that can be reloaded automatically every page load.
-//a new device will be registered with ArcGIS Online to get an access token
+// this will create a session persisted to localstorage or cookies that can be reloaded automatically every page load.
+// a new device will be registered with ArcGIS Online to get an access token
 geotriggers = new Geotriggers.Session({
   applicationId: "XXX", // set your application id
 });
 
 // do stuff with `geotriggers`
-geotrigger.get("device/list").success(function(deviceInfo){
+geotriggers.request("device/list").success(function(deviceInfo){
   console.log(deviceInfo);
 });
 ```
@@ -97,19 +97,15 @@ persistence yourself.
 ```js
 geotriggers = new Geotriggers.Session({
   applicationId: "XXX", // set your application id
-  session: // the saved session from your server or an empty object
 });
 
 // when you are ready to persist the session convert it to JSON
-// Store this JSON object somewhere and pass it as the `session`
-// parameter with your initalize your `Geotriggers.Session`
-geotriggers.toJSON()
+// Store this JSON object and use it to initalize your session later
+mySession = JSON.stringify(geotriggers.toJSON())
 
-// when you need to reinitialize a session make a new session and
-// pass the stored JSON in.
-geotriggers = new Geotriggers.Session({
-  session: storedJson
-});
+// when you need to reinitialize a session make
+// a new session from the stored JSON in.
+geotriggers = new Geotriggers.Session(JSON.parse(mySession));
 ```
 
 ## Using with a refresh token and access token
@@ -119,7 +115,7 @@ If you have an access token and a refresh token from another source, like your a
 ```js
 geotriggers = new Geotriggers.Session({
   applicationId: "XXX", // set your application id
-  accessToken: "XXX",
+  token: "XXX",
   refreshToken: "XXX",
   persistSession: false // dont persist the session, since you want to handle it yourself
 });
@@ -162,9 +158,9 @@ require([
 
 # Anonymous usage
 
-If you don't have an `access_token` the Geotriggers SDK will automatically register an anonymous device with ArcGIS Online.
+If you don't have an `token` the Geotriggers SDK will automatically register an anonymous device with ArcGIS Online.
 
-This will get you an `access_token` and `refresh_token` for the new device. If `persistSession` is true this session will
+This will get you an `token` and `refresh_token` for the new device. If `persistSession` is true this session will
 be persisted and reloaded on every page load so another device will not be created.
 
 ## Node Tests
