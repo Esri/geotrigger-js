@@ -9,25 +9,29 @@
 
       var geotriggers = new Geotriggers.Session({
         applicationId: ApplicationId,
-        //applicationSecret: ApplicationSecret,
+        applicationSecret: ApplicationSecret,
         persistSession: false,
         debug: true
       });
 
-      geotriggers.post("location/update", {
-        params: {
-          locations: [
-            {
-              timestamp: (new Date()).toISOString(),
-              planet: "earth",
-              latitude: 45,
-              longitude: -122,
-              accuracy: 12,
-              speed: 15,
-              altitude: 10
-            }
-          ]
-        }
+      // geotriggers.post("location/update", {
+      //   params: {
+      //     locations: [
+      //       {
+      //         timestamp: (new Date()).toISOString(),
+      //         planet: "earth",
+      //         latitude: 45,
+      //         longitude: -122,
+      //         accuracy: 12,
+      //         speed: 15,
+      //         altitude: 10
+      //       }
+      //     ]
+      //   }
+      // });
+
+      geotriggers.request("trigger/list").success(function(response) {
+        console.log(response);
       });
     </script>
   </head>

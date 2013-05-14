@@ -26,6 +26,7 @@
   var tokenUrl          = "https://devext.arcgis.com/sharing/oauth2/token";
   var registerDeviceUrl = "https://devext.arcgis.com/sharing/oauth2/registerDevice";
   var exports           = {};
+  var IS_IE             = typeof XDomainRequest !== "undefined";
 
   /*
   Custom Deferred Callbacks.
@@ -93,9 +94,10 @@
   function Session(options){
     this._requestQueue = [];
     this._events = {};
+    this._failedRefreshes = 0;
+    this.refreshTries = 3;
 
     var defaults = {
-      session: {},
       preferLocalStorage: true,
       persistSession: (typeof module !== 'undefined' && module.exports) ? false : true,
       geotriggersUrl: geotriggersUrl,
@@ -106,7 +108,7 @@
     };
 
     // set application id
-    if(!options.applicationId && !options.session) {
+    if(!options.applicationId) {
       throw new Error("Geotriggers.Session requires an `applicationId` or a `session` parameter.");
     }
 
@@ -125,46 +127,34 @@
       }
     }
 
-    // restore an old session from a passed object
-    if(options.session) {
-      util.merge(this, options.session);
-    }
-
     // if there is an access token and it is after when the token expires or there is no access token
-    if((this.accessToken && (Date.now() > new Date(this.expiresOn).getTime())) || !this.accessToken){
+    if((this.token && (Date.now() > new Date(this.expiresOn).getTime())) || !this.token){
       this.refresh();
     }
   }
 
-  Session.prototype.get = function(method, options){
-    options = options || {};
-    options.type = "GET";
-    options.method = method;
-    options.returnXHR = false;
-    return this.request(options);
-  };
-  Session.prototype.post = function(method, options){
-    options =  options || {};
-    options.type = "POST";
-    options.method = method;
-    options.returnXHR = false;
-    return this.request(options);
-  };
   Session.prototype.authenticated = function(){
-    return !!this.accessToken;
+    return !!this.token;
   };
+
   Session.prototype._runQueue = function(){
     for (var i = 0; i < this._requestQueue.length; i++) {
       var request = this._requestQueue[i];
-      this.request(request.options, request.deferred);
+      this.request(request.method, request.options, request.deferred);
     }
   };
+
   Session.prototype.refresh = function(){
     this.log("refrehsing session");
+    if(this._failedRefreshes >= this.refreshTries){
+      this.emit("authentication:cannotrefresh");
+      this.log("failed to refresh token " + this._failedRefreshes + " times not continuing to refresh");
+      return;
+    }
     // if we have an application secret just request a new token
     if(this.applicationSecret){
       this.log("getting new application token");
-      this.post(this.tokenUrl, {
+      this.request(this.tokenUrl, {
         params: {
           client_id: this.applicationId,
           client_secret: this.applicationSecret,
@@ -172,7 +162,7 @@
           grant_type: "client_credentials"
         }
       }).then(util.bind(this, function(response){
-        this.accessToken = response.access_token;
+        this.token = response.access_token;
         this.expiresOn = new Date(new Date().getTime() + ((response.expires_in-(60*5)) *1000));
         this._processAuth();
       }), util.bind(this, this._authError));
@@ -180,7 +170,7 @@
     // if we have a refresh token lets use it to get a new token
     } else if (this.refreshToken){
       this.log("getting new device token with a refresh token");
-      this.post(this.tokenUrl, {
+      this.request(this.tokenUrl, {
         params: {
           client_id: this.applicationId,
           refresh_token: this.refreshToken,
@@ -188,7 +178,7 @@
           grant_type: "refresh_token"
         }
       }).then(util.bind(this, function(response){
-        this.accessToken = response.access_token;
+        this.token = response.access_token;
         this.refreshToken = response.refresh_token;
         this.expiresOn = new Date(new Date().getTime() + ((response.expires_in-(60*5)) *1000));
         this._processAuth();
@@ -197,20 +187,21 @@
     // else register a new device
     } else if (this.automaticRegistation) {
       this.log("no applicaitonSecret or refreshToken, registering a new device");
-      this.post(this.registerDeviceUrl, {
+      this.request(this.registerDeviceUrl, {
         params: {
           client_id: this.applicationId,
           f: "json"
         }
       }).then(util.bind(this, function(response){
         this.deviceId = response.device.deviceId;
-        this.accessToken = response.deviceToken.access_token;
+        this.token = response.deviceToken.access_token;
         this.refreshToken = response.deviceToken.refresh_token;
         this.expiresOn = new Date(new Date().getTime() + ((response.deviceToken.expires_in-(60*5)) *1000));
         this._processAuth(response);
       }), util.bind(this, this._authError));
     }
   };
+
   Session.prototype.toJSON = function(){
     var obj = {};
       for (var key in this) {
@@ -220,6 +211,7 @@
       }
       return obj;
   };
+
   Session.prototype.on = function(type, listener){
     if (typeof this._events[type] === "undefined"){
       this._events[type] = [];
@@ -227,6 +219,7 @@
 
     this._events[type].push(listener);
   };
+
   Session.prototype.emit = function(type){
     var args = [].splice.call(arguments,1);
     if (this._events[type] instanceof Array){
@@ -236,6 +229,7 @@
       }
     }
   };
+
   Session.prototype.off = function(type, listener){
     if (this._events[type] instanceof Array){
       var listeners = this._events[type];
@@ -247,7 +241,9 @@
       }
     }
   };
+
   Session.prototype._processAuth = function(response){
+    this._failedRefreshes = 0;
     if(this.persistSession){
       this.persist();
     }
@@ -256,10 +252,14 @@
     this.emit("authentication:success", response);
     this.emit("authenticated", response);
   };
+
   Session.prototype._authError = function(error){
+    this._failedRefreshes++;
     this.log("error getting token or registering device from ArcGIS, " + error.error_description);
     this.emit("authentication:failure", error);
+    this.refresh();
   };
+
   Session.prototype.log = function(){
     var args = Array.prototype.slice.apply(arguments);
     args.unshift(this.key);
@@ -267,14 +267,15 @@
       util.log.apply(this, args);
     }
   };
-  Session.prototype.request = function(options, dfd){
+
+  Session.prototype.request = function(method, options, dfd){
     var session = this;
 
     // set defaults for parameters, callback, XHR
     var defaults = {
       params: {},
       callback: null,
-      returnXHR: true
+      addCallbacksToDeferred: true
     };
 
     // make a new deferred for callbacks
@@ -286,32 +287,13 @@
     // merge settings and defaults
     var settings = util.merge(defaults, options);
 
-    // assume this is a request to getriggers is it doesnt start with (http|https)://
-    var geotriggersRequest = !settings.method.match(/^https?:\/\//);
+    // assume this is a request to getriggers is it doesn't start with (http|https)://
+    var geotriggersRequest = !method.match(/^https?:\/\//);
 
     // create the url for the request
-    var url = (geotriggersRequest) ? this.geotriggersUrl + settings.method : settings.method;
-
-    // if we are not authenticated yet save these options and deferred for later
-    if(!this.authenticated() && geotriggersRequest){
-      this.log("not authenticated for request to "+ url + " as a " + this.authenticatedAs + " refreshing session and queuing request");
-      this._requestQueue.push({
-        deferred: deferred,
-        options: options
-      });
-      return deferred;
-    }
+    var url = (geotriggersRequest) ? this.geotriggersUrl + method : method;
 
     this.log("making request to " + url + " as a " + this.authenticatedAs);
-
-    // if the user supplied a callback and the callback has NOT been applied to the deferred
-    if(settings.callback) {
-      deferred.then(function(result){
-        settings.callback(null, result);
-      }, function(error){
-        settings.callback(error, null);
-      });
-    }
 
     // callback for handling a successful request
     var handleSuccessfulResponse = function(){
@@ -324,35 +306,39 @@
       // if it didn't resolve or reject the callback
       // if it did refresh the auth and run the request again
       if(error && error.type === "invalidHeader" && error.headers.Authorization){
-        // dont add the settings.callback function to the deferred next time around;
-        options.addCallbacksToDeferred = false;
+        session.log("invalid authentication for http request to " + url +" trying to refresh token");
+
         // push our request options and deferred into the request queue
         session._requestQueue.push({
-          options: options,
+          method: method,
+          options: settings,
           deferred: deferred
         });
         // refresh the auth
         session.refresh();
       } else {
-        if(settings.returnXHR && !error){
-          session.log("running success callback for request to " + url + " with ", httpRequest);
-          deferred.resolve(httpRequest);
-        } else if (settings.returnXHR && error){
-          session.log("running error callback for request to " + url + " with ", httpRequest);
-          deferred.reject(httpRequest);
-        } else if (!error){
+        if (!error){
           session.log("running success callback for request to " + url + " with ", response);
-          deferred.resolve(response);
+          deferred.resolve(response, httpRequest);
+          if(settings.callback) {
+            settings.callback(null, response, httpRequest);
+          }
         } else if (error){
           session.log("running error callback for request to " + url + " with ", response);
-          deferred.reject(error);
+          deferred.reject(error, httpRequest);
+          if(settings.callback) {
+            settings.callback(error, null, httpRequest);
+          }
         } else {
           var errorMessage = {
             type: "unexpected_response",
             message: "the api returned a non json or unexpected data"
           };
           session.log("running error callback for request to " + url + " with ", errorMessage);
-          deferred.reject(errorMessage);
+          deferred.reject(errorMessage, httpRequest);
+          if(settings.callback) {
+            settings.callback(errorMessage, null, httpRequest);
+          }
         }
       }
     };
@@ -378,7 +364,7 @@
     };
 
     // use XDomainRequest (ie8) or XMLHttpRequest (standard)
-    if (typeof XDomainRequest !== "undefined") {
+    if (IS_IE) {
       httpRequest = new XDomainRequest();
       httpRequest.onload = handleSuccessfulResponse;
       httpRequest.onerror = handleErrorResponse;
@@ -390,41 +376,31 @@
       throw new Error("This browser does not support XMLHttpRequest or XDomainRequest");
     }
 
-    // Convert parameters to form vars for transport
-    var queryString = util.serialize(settings.params);
-
-    // make the request
-    switch (settings.type) {
-      case "GET":
-        httpRequest.open("GET", url + "?" + queryString);
-        // is we are authenticated and this is a geotriggers request
-        if(geotriggersRequest){
-          httpRequest.setRequestHeader('Authorization', 'Bearer '+ this.accessToken);
-        }
-        httpRequest.send(null);
-        this.log("sent GET request to "+ url + " as a " + this.authenticatedAs + " with", settings.params);
-        break;
-      case "POST":
-        httpRequest.open("POST", url);
-        if(httpRequest instanceof XMLHttpRequest){
-          httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        }
-        // is we are authenticated and this is a geotriggers request
-        if(geotriggersRequest){
-          httpRequest.setRequestHeader('Authorization', 'Bearer '+ this.accessToken);
-        }
-        httpRequest.send(queryString);
-        this.log("sent POST request to "+ url + " as a " + this.authenticatedAs + " with", settings.params);
-        break;
+    // set the access token in the body
+    if(geotriggersRequest){
+      settings.params.token = this.token;
     }
 
-    // return the deferred
+    // Convert parameters to form encoded
+    var body = util.serialize(settings.params);
+
+    httpRequest.open("POST", url);
+
+    if(!IS_IE){
+      httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    }
+
+    httpRequest.send(body);
+
+    this.log("sent request to "+ url + " as a " + this.authenticatedAs + " with", settings.params);
+
     return deferred;
   };
+
   Session.prototype.persist = function() {
     var value = {};
     if(this.applicationSecret){ value.applicationSecret = this.applicationSecret; }
-    if(this.accessToken){ value.accessToken = this.accessToken; }
+    if(this.token){ value.token = this.token; }
     if(this.refreshToken){ value.refreshToken = this.refreshToken; }
     if(this.deviceId){ value.deviceId = this.deviceId; }
     if(this.preferLocalStorage && hasLocalStorage){
@@ -435,6 +411,7 @@
       cookie.set(this.key, value);
     }
   };
+
   Session.prototype.destroy = function() {
     this.log("destorying persisted session");
     if(this.preferLocalStorage && hasLocalStorage) {
@@ -499,8 +476,9 @@
     // Makes it safe to log from anywhere
     log: function(){
       var args = Array.prototype.slice.apply(arguments);
-      if (typeof console !== undefined && console.log) {
-        console.log.apply(console, args);
+      if (Function.prototype.bind && typeof console !== undefined && console.log) {
+        var log = Function.prototype.bind.call(console.log, console);
+        log.apply(console, args);
       }
     },
 
@@ -511,7 +489,6 @@
     isArray: function(thing){
       return Object.prototype.toString.call(thing) === '[object Array]';
     },
-
 
     serialize: function(obj, prefix) {
 

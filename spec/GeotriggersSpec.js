@@ -66,11 +66,13 @@ describe("geotriggers.js", function() {
       persistSession: false
     });
 
-    it("should make a GET request with a callback", function(){
+    it("should get a list of devices with a callback", function(){
       var spy = jasmine.createSpy();
 
       runs(function(){
-        geotriggers.get("device/list",{}).success(spy);
+        geotriggers.request("device/list",{
+          callback: spy
+        });
       });
 
       waitsFor(function(){
@@ -78,7 +80,9 @@ describe("geotriggers.js", function() {
       }, "Did not make request for device/list", 3000);
 
       runs(function(){
-        expect(spy).toHaveBeenCalledWithArgsLike({
+        callbackArgs = spy.mostRecentCall.args;
+        expect(callbackArgs[0]).toBeFalsy();
+        expect(callbackArgs[1]).objectToLooselyMatch({
           devices: [{
             deviceId: "xxx",
             deviceSecret: null,
@@ -86,15 +90,16 @@ describe("geotriggers.js", function() {
             tags: ["deviceTag"],
             updatedAt: null
           }]
-        });
+        }, null, {});
+        expect(callbackArgs[2]).toBeInstanceOf(XMLHttpRequest);
       });
     });
 
-    it("should make a POST request with a callback", function(){
+    it("should update a device and use a deferred", function(){
       var spy = jasmine.createSpy();
 
       runs(function(){
-        geotriggers.post("device/update",{
+        geotriggers.request("device/update", {
           params: {
             addTags: ["foo"],
             properties: {
@@ -123,62 +128,12 @@ describe("geotriggers.js", function() {
       });
     });
 
-    it("should make a GET request and use an xhr object in the callback", function(){
-      var spy = jasmine.createSpy();
-
-      runs(function(){
-        geotriggers.request({
-          type: "GET",
-          method: "device/list"
-        }).then(spy);
-      });
-
-      waitsFor(function(){
-        return spy.callCount;
-      }, "GET request timed out", 2000);
-
-      runs(function(){
-        expect(spy.mostRecentCall.args[0] instanceof XMLHttpRequest);
-      });
-    });
-
-    it("should make a POST request and use an xhr object in the callback", function(){
-      var spy = jasmine.createSpy();
-
-      runs(function(){
-        geotriggers.request({
-          method: "device/update",
-          type: "POST",
-          params: {
-            addTags: ["foo"],
-            properties: {
-              foo: "bar"
-            }
-          }
-        }).success(spy);
-      });
-
-      waitsFor(function(){
-        return spy.callCount;
-      }, "Did not make request for device/update", 3000);
-
-      runs(function(){
-        expect(spy.mostRecentCall.args[0] instanceof XMLHttpRequest);
-      });
-    });
-
     it("should chain deferreds", function(){
       var spy1 = jasmine.createSpy();
       var spy2 = jasmine.createSpy();
 
       runs(function(){
-        geotriggers.request({
-          method: "device/update",
-          type: "POST",
-          params: {
-            addTags: ["test"]
-          }
-        }).then(spy1).success(spy2);
+        geotriggers.request("device/list").then(spy1).success(spy2);
       });
 
       waitsFor(function(){
@@ -196,9 +151,7 @@ describe("geotriggers.js", function() {
       var errorSpy = jasmine.createSpy("error");
 
       runs(function(){
-        geotriggers.request({
-          method: "location/update",
-          type: "POST",
+        geotriggers.request("location/update", {
           params: {
             locations: [{
               "timestamp": "2012-05-09T16:03:53-0700",
@@ -226,14 +179,12 @@ describe("geotriggers.js", function() {
       });
     });
 
-    it("should be able to update location", function(){
+    it("should be able to create a trigger", function(){
       var successSpy = jasmine.createSpy("success");
       var errorSpy = jasmine.createSpy("error");
 
       runs(function(){
-        geotriggers.request({
-          method: "trigger/create",
-          type: "POST",
+        geotriggers.request("trigger/create",{
           params: {
             condition: {
               direction: "enter",
