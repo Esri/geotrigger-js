@@ -67,8 +67,6 @@ describe("geotriggers.js", function() {
       debug: true
     });
 
-    window.geotriggers = geotriggers;
-
     it("should get a list of devices with a callback", function(){
       var spy = jasmine.createSpy();
 
