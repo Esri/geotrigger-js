@@ -51,11 +51,24 @@ module.exports = function(grunt) {
       }
     },
     jasmine: {
-      src: 'src/**/*.js',
-      options: {
-        specs: 'spec/*Spec.js',
-        helpers: 'spec/*Helpers.js',
-        keepRunner: true
+      coverage: {
+        src: 'src/**/*.js',
+        options: {
+          specs: 'spec/*Spec.js',
+          helpers: 'spec/*Helpers.js',
+          keepRunner: true,
+          template: require('grunt-template-jasmine-istanbul'),
+          templateOptions: {
+            coverage: 'reports/coverage/coverage.json',
+            report: 'reports/coverage',
+            thresholds: {
+              lines: 75,
+              statements: 75,
+              branches: 75,
+              functions: 90
+            }
+          }
+        }
       }
     },
     jasmine_node: {
@@ -69,10 +82,22 @@ module.exports = function(grunt) {
         useHelpers: true
       },
       all: ['spec/']
+    },
+    complexity: {
+      generic: {
+        src: ['src/**/*.js'],
+        options: {
+          jsLintXML: 'reports/complexity.xml', // create XML JSLint-like report
+          errorsOnly: false, // show only maintainability errors
+          cyclomatic: 3,
+          halstead: 8,
+          maintainability: 100
+        }
+      }
     }
   });
 
-  grunt.registerTask('default', ['jshint', 'test']);
+  grunt.registerTask('default', ['jshint', 'test', 'complexity']);
   grunt.registerTask('build', ['default', 'uglify']);
   grunt.registerTask('test', ['jasmine_node','jasmine']);
 
@@ -81,5 +106,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-jasmine');
   grunt.loadNpmTasks('grunt-jasmine-node');
+  grunt.loadNpmTasks('grunt-complexity');
 
 };

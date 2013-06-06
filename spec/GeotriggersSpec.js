@@ -63,8 +63,11 @@ describe("geotriggers.js", function() {
   describe("api request methods", function(){
     var geotriggers = new Geotriggers.Session({
       applicationId: ApplicationId,
-      persistSession: false
+      persistSession: false,
+      //debug: true
     });
+
+    window.geotriggers = geotriggers;
 
     it("should get a list of devices with a callback", function(){
       var spy = jasmine.createSpy();
@@ -151,7 +154,7 @@ describe("geotriggers.js", function() {
       var errorSpy = jasmine.createSpy("error");
 
       runs(function(){
-        geotriggers.request("location/update", {
+        var req = geotriggers.request("location/update", {
           params: {
             locations: [{
               "timestamp": "2012-05-09T16:03:53-0700",
@@ -167,6 +170,7 @@ describe("geotriggers.js", function() {
             }]
           }
         }).then(successSpy, errorSpy);
+        console.log(req);
       });
 
       waitsFor(function(){
