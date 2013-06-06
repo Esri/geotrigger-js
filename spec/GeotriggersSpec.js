@@ -64,7 +64,7 @@ describe("geotriggers.js", function() {
     var geotriggers = new Geotriggers.Session({
       applicationId: ApplicationId,
       persistSession: false,
-      //debug: true
+      debug: true
     });
 
     window.geotriggers = geotriggers;
@@ -83,7 +83,7 @@ describe("geotriggers.js", function() {
       }, "Did not make request for device/list", 3000);
 
       runs(function(){
-        callbackArgs = spy.mostRecentCall.args;
+        var callbackArgs = spy.mostRecentCall.args;
         expect(callbackArgs[0]).toBeFalsy();
         expect(callbackArgs[1]).objectToLooselyMatch({
           devices: [{
@@ -154,7 +154,7 @@ describe("geotriggers.js", function() {
       var errorSpy = jasmine.createSpy("error");
 
       runs(function(){
-        var req = geotriggers.request("location/update", {
+        geotriggers.request("location/update", {
           params: {
             locations: [{
               "timestamp": "2012-05-09T16:03:53-0700",
@@ -170,7 +170,6 @@ describe("geotriggers.js", function() {
             }]
           }
         }).then(successSpy, errorSpy);
-        console.log(req);
       });
 
       waitsFor(function(){
