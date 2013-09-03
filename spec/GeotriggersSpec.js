@@ -2,8 +2,8 @@ if(typeof module === "object" && !Geotriggers){
   var Geotriggers = require("../src/geotriggers");
 }
 
-var ApplicationId = "MpwWGenqaSCMSMii";
-var ApplicationSecret = "520b13154c0f474caa6f5193a1aa122f";
+var ApplicationId = "rcMNAPBoIn2M1JoI";
+var ApplicationSecret = "77edd9c16dde46ad9a93b79c83229887";
 
 describe("geotriggers.js", function() {
 
@@ -63,7 +63,8 @@ describe("geotriggers.js", function() {
   describe("api request methods", function(){
     var geotriggers = new Geotriggers.Session({
       applicationId: ApplicationId,
-      persistSession: false
+      persistSession: false,
+      debug: true
     });
 
     it("should get a list of devices with a callback", function(){
@@ -80,7 +81,7 @@ describe("geotriggers.js", function() {
       }, "Did not make request for device/list", 3000);
 
       runs(function(){
-        callbackArgs = spy.mostRecentCall.args;
+        var callbackArgs = spy.mostRecentCall.args;
         expect(callbackArgs[0]).toBeFalsy();
         expect(callbackArgs[1]).objectToLooselyMatch({
           devices: [{
@@ -198,7 +199,9 @@ describe("geotriggers.js", function() {
               }
             },
             action: {
-              message: "At some random polygon in portland"
+              notification:{
+                text: "At some random polygon in portland"
+              }
             }
           }
         }).then(successSpy, errorSpy);
