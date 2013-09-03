@@ -21,7 +21,7 @@
   Configuration Variables
   -----------------------------------
   */
-  var version           = "0.0.2";
+  var version           = "0.0.3";
   var geotriggersUrl    = "https://geotrigger.arcgis.com/";
   var tokenUrl          = "https://arcgis.com/sharing/oauth2/token";
   var registerDeviceUrl = "https://arcgis.com/sharing/oauth2/registerDevice";
@@ -108,15 +108,15 @@
     };
 
     // set application id
-    if(!options.applicationId) {
-      throw new Error("Geotriggers.Session requires an `applicationId` or a `session` parameter.");
+    if(!options.clientId) {
+      throw new Error("Geotriggers.Session requires an `clientId` or a `session` parameter.");
     }
 
     // merge defaults and options into `this`
     util.merge(this, util.merge(defaults, options));
 
-    this.authenticatedAs = (this.applicationId && this.applicationSecret) ? "application" : "device";
-    this.key = "_geotriggers_" + this.authenticatedAs + "_" + this.applicationId;
+    this.authenticatedAs = (this.clientId && this.clientSecret) ? "application" : "device";
+    this.key = "_geotriggers_" + this.authenticatedAs + "_" + this.clientId;
 
     //restore a stored session if we have one
     if(this.persistSession) {
@@ -152,12 +152,12 @@
       return;
     }
     // if we have an application secret just request a new token
-    if(this.applicationSecret){
+    if(this.clientSecret){
       this.log("getting new application token");
       this.request(this.tokenUrl, {
         params: {
-          client_id: this.applicationId,
-          client_secret: this.applicationSecret,
+          client_id: this.clientId,
+          client_secret: this.clientSecret,
           f: "json",
           grant_type: "client_credentials"
         }
@@ -172,7 +172,7 @@
       this.log("getting new device token with a refresh token");
       this.request(this.tokenUrl, {
         params: {
-          client_id: this.applicationId,
+          client_id: this.clientId,
           refresh_token: this.refreshToken,
           f: "json",
           grant_type: "refresh_token"
@@ -189,7 +189,7 @@
       this.log("no applicaitonSecret or refreshToken, registering a new device");
       this.request(this.registerDeviceUrl, {
         params: {
-          client_id: this.applicationId,
+          client_id: this.clientId,
           f: "json"
         }
       }).then(util.bind(this, function(response){
@@ -400,7 +400,7 @@
 
   Session.prototype.persist = function() {
     var value = {};
-    if(this.applicationSecret){ value.applicationSecret = this.applicationSecret; }
+    if(this.clientSecret){ value.clientSecret = this.clientSecret; }
     if(this.token){ value.token = this.token; }
     if(this.refreshToken){ value.refreshToken = this.refreshToken; }
     if(this.deviceId){ value.deviceId = this.deviceId; }
