@@ -21,10 +21,10 @@
   Configuration Variables
   -----------------------------------
   */
-  var version           = "0.0.1";
-  var geotriggersUrl    = "http://geotriggersdev.arcgis.com/";
-  var tokenUrl          = "https://devext.arcgis.com/sharing/oauth2/token";
-  var registerDeviceUrl = "https://devext.arcgis.com/sharing/oauth2/registerDevice";
+  var version           = "0.0.2";
+  var geotriggersUrl    = "https://geotrigger.arcgis.com/";
+  var tokenUrl          = "https://arcgis.com/sharing/oauth2/token";
+  var registerDeviceUrl = "https://arcgis.com/sharing/oauth2/registerDevice";
   var exports           = {};
   var IS_IE             = typeof XDomainRequest !== "undefined";
 
@@ -381,13 +381,14 @@
       settings.params.token = this.token;
     }
 
-    // Convert parameters to form encoded
-    var body = util.serialize(settings.params);
+    // Convert parameters to form encoded (AGO) or a JSON sting (Geotriggers)
+    var body = (geotriggersRequest) ? JSON.stringify(settings.params) : util.serialize(settings.params);
 
     httpRequest.open("POST", url);
 
     if(!IS_IE){
-      httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      var contentType = (geotriggersRequest) ? 'application/json' : 'application/x-www-form-urlencoded';
+      httpRequest.setRequestHeader('Content-Type', contentType);
     }
 
     httpRequest.send(body);
@@ -511,52 +512,6 @@
 
         // join with ampersands
         return str.join("&");
-    },
-
-    // Converts and object to a query string
-    toQueryString: function(obj, parentObject) {
-      if( typeof obj !== 'object' ) {
-        return '';
-      }
-
-      var rv = '';
-
-      for(var prop in obj) {
-        if (obj.hasOwnProperty(prop)) {
-          var qname = (parentObject) ? parentObject + '.' + prop : prop;
-
-          // Expand Arrays
-          if (obj[prop] instanceof Array) {
-            for( var i = 0; i < obj[prop].length; i++ ){
-              if( typeof obj[prop][i] === 'object' ){
-                rv += '&' + util.toQueryString( obj[prop][i], qname );
-              } else{
-                rv += '&' + encodeURIComponent(qname) + '=' + encodeURIComponent( obj[prop][i] );
-              }
-            }
-
-          // Expand Dates
-          } else if (obj[prop] instanceof Date) {
-            rv += '&' + encodeURIComponent(qname) + '=' + obj[prop].getTime();
-
-          // Expand Objects
-          } else if (obj[prop] instanceof Object) {
-            // If they're String() or Number() etc
-            if (obj.toString && obj.toString !== Object.prototype.toString){
-              rv += '&' + encodeURIComponent(qname) + '=' + encodeURIComponent( obj[prop].toString() );
-            // Otherwise, we want the raw properties
-            } else{
-              rv += '&' + util.toQueryString(obj[prop], qname);
-            }
-
-          // Output non-object
-          } else {
-            rv += '&' + encodeURIComponent(qname) + '=' + encodeURIComponent( obj[prop] );
-          }
-        }
-      }
-
-      return rv.replace(/^&/,'');
     }
   };
 
