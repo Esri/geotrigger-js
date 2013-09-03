@@ -1,10 +1,11 @@
 {
   "name": "geotriggers-js",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Small client for interacting with the ArcGIS Geotriggers API.",
   "main": "src/geotriggers.js",
   "dependencies": {
-    "xmlhttprequest": "~1.5.0"
+    "xmlhttprequest": "~1.5.0",
+    "grunt-complexity": "~0.1.2"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
@@ -12,7 +13,8 @@
     "grunt-contrib-uglify": "~0.2.0",
     "grunt-contrib-watch": "~0.3.1",
     "grunt-contrib-jasmine": "~0.4.2",
-    "grunt-jasmine-node": "~0.1.0"
+    "grunt-jasmine-node": "~0.1.0",
+    "grunt-template-jasmine-istanbul": "~0.2.4"
   },
   "scripts": {
     "test": "grunt test"
