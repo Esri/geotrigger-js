@@ -2,8 +2,8 @@ if(typeof module === "object" && !Geotriggers){
   var Geotriggers = require("../src/geotriggers");
 }
 
-var ApplicationId = "MpwWGenqaSCMSMii";
-var ApplicationSecret = "520b13154c0f474caa6f5193a1aa122f";
+var ApplicationId = "rcMNAPBoIn2M1JoI";
+var ApplicationSecret = "77edd9c16dde46ad9a93b79c83229887";
 
 describe("geotriggers.js", function() {
 
@@ -199,7 +199,9 @@ describe("geotriggers.js", function() {
               }
             },
             action: {
-              message: "At some random polygon in portland"
+              notification:{
+                text: "At some random polygon in portland"
+              }
             }
           }
         }).then(successSpy, errorSpy);
