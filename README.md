@@ -163,10 +163,9 @@ Once these are installed you can now run the tests with `grunt jasmine`.
 
 ## Building
 
-Make sure you have all the testing dependancies installed then run `grunt` from the command line. If the files lints and passes all the tests it will be concatenated and minified to the `dist` folder.
+Make sure you have all the testing dependancies installed then run `grunt build` from the command line.
 
 ## Todos
 
 * HTML5 geolocation helpers for `location/update`
 * Batching requests
-* Support for a deferred library
