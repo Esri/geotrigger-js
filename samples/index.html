@@ -4,17 +4,17 @@
     <title>Sample</title>
     <script src="../src/geotriggers.js"></script>
     <script>
-      var ApplicationId = "dF0rDjvzXJTzSlk7";
-      var ApplicationSecret = "ac2791a40646418c907840ef34f2e1ba";
+      var ApplicationId = "rcMNAPBoIn2M1JoI";
+      var ApplicationSecret = "77edd9c16dde46ad9a93b79c83229887";
 
       // var ApplicationId = "MpwWGenqaSCMSMii";
       // var ApplicationSecret = "520b13154c0f474caa6f5193a1aa122f";
 
       var geotriggers = new Geotriggers.Session({
-        applicationId: ApplicationId,
-        applicationSecret: ApplicationSecret,
+        clientId: ApplicationId,
+        //clientSecret: ApplicationSecret,
         persistSession: false,
-        debug: true
+        //debug: true
       });
 
       // geotriggers.post("location/update", {
@@ -33,9 +33,9 @@
       //   }
       // });
 
-      // geotriggers.request("trigger/list").success(function(response) {
-      //   console.log(response);
-      // });
+      geotriggers.request("trigger/list", function(error, response, xhr) {
+        console.log(response);
+      });
     </script>
   </head>
   <body>
