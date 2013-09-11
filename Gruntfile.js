@@ -26,10 +26,10 @@ module.exports = function(grunt) {
           exports: true
         }
       },
-      all: ['Gruntfile.js', 'src/**/*.js']
+      all: ['Gruntfile.js', 'geotriggers.js']
     },
     watch: {
-      files: ['Gruntfile.js', 'src/**/*.js'],
+      files: ['Gruntfile.js', 'geotriggers.js'],
       tasks: 'default'
     },
     uglify: {
@@ -41,36 +41,11 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          'dist/geotriggers.min.js': ['src/**/*.js']
-        }
-      },
-      versioned: {
-        files: {
-          'dist/versions/geotriggers-<%= pkg.version %>.min.js': ['src/**/*.js']
+          'geotriggers.min.js': ['geotriggers.js']
         }
       }
     },
-    jasmine: {
-      coverage: {
-        src: 'src/**/*.js',
-        options: {
-          specs: 'spec/*Spec.js',
-          helpers: 'spec/*Helpers.js',
-          keepRunner: false,
-          template: require('grunt-template-jasmine-istanbul'),
-          templateOptions: {
-            coverage: 'reports/coverage/coverage.json',
-            report: 'reports/coverage',
-            thresholds: {
-              lines: 75,
-              statements: 75,
-              branches: 75,
-              functions: 90
-            }
-          }
-        }
-      }
-    },
+
     jasmine_node: {
       options: {
         forceExit: true,
@@ -83,9 +58,31 @@ module.exports = function(grunt) {
       },
       all: ['spec/']
     },
+
+    karma: {
+      test: {
+        configFile: 'karma.conf.js'
+      },
+      watch: {
+        configFile: 'karma.conf.js',
+        autoWatch: true,
+        singleRun: false
+      },
+      coverage: {
+        configFile: 'karma.conf.js',
+        preprocessors:{
+          'geotriggers.js': 'coverage'
+        },
+        coverageReporter: {
+          type : 'html',
+          dir : 'reports/coverage/'
+        }
+      }
+    },
+
     complexity: {
       generic: {
-        src: ['src/**/*.js'],
+        src: ['geotriggers.js'],
         options: {
           jsLintXML: 'reports/complexity.xml', // create XML JSLint-like report
           errorsOnly: false, // show only maintainability errors
@@ -97,15 +94,15 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.registerTask('default', ['jshint', 'test', 'complexity']);
+  grunt.registerTask('default', ['jshint', 'test']);
   grunt.registerTask('build', ['default', 'uglify']);
-  grunt.registerTask('test', ['jasmine_node','jasmine']);
+  grunt.registerTask('test', ['jasmine_node','karma:coverage']);
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-contrib-jasmine');
   grunt.loadNpmTasks('grunt-jasmine-node');
   grunt.loadNpmTasks('grunt-complexity');
+  grunt.loadNpmTasks('grunt-karma');
 
 };
