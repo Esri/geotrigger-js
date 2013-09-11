@@ -1,5 +1,5 @@
-if(typeof module === "object" && !Geotriggers){
-  var Geotriggers = require("../src/geotriggers");
+if(typeof module === "object"){
+  var Geotriggers = require("../geotriggers");
 }
 
 var ClientId = "rcMNAPBoIn2M1JoI";
@@ -9,11 +9,12 @@ describe("geotriggers.js", function() {
 
   it("should throw an error if initialized without an application_id or session", function(){
     expect(function(){
-      new Geotriggers.Session();
+      var geotriggers = new Geotriggers.Session();
     }).toThrow();
   });
 
   it("should fire an `authenticated` event after the initializes successfully with an application id and secret", function(){
+
     var spy = jasmine.createSpy();
     var geotriggers;
 
@@ -24,16 +25,15 @@ describe("geotriggers.js", function() {
         persistSession: false
       });
 
-      geotriggers.on("authenticated", spy);
+      geotriggers.on("authentication:success", spy);
     });
 
     waitsFor(function(){
       return geotriggers.authenticated();
-    }, "Did not auth", 3000);
+    }, "Did not auth", 6000);
 
     runs(function(){
       expect(spy).toHaveBeenCalled();
-      expect(geotriggers.authenticated()).toBeTruthy();
     });
   });
 
@@ -47,7 +47,7 @@ describe("geotriggers.js", function() {
         persistSession: false
       });
 
-      geotriggers.on("authenticated", spy);
+      geotriggers.on("authentication:success", spy);
     });
 
     waitsFor(function(){
@@ -63,17 +63,14 @@ describe("geotriggers.js", function() {
   describe("api request methods", function(){
     var geotriggers = new Geotriggers.Session({
       clientId: ClientId,
-      persistSession: false,
-      debug: true
+      persistSession: false
     });
 
     it("should get a list of devices with a callback", function(){
       var spy = jasmine.createSpy();
 
       runs(function(){
-        geotriggers.request("device/list",{
-          callback: spy
-        });
+        geotriggers.request("device/list", spy);
       });
 
       waitsFor(function(){
@@ -101,13 +98,11 @@ describe("geotriggers.js", function() {
 
       runs(function(){
         geotriggers.request("device/update", {
-          params: {
-            addTags: ["foo"],
-            properties: {
-              foo: "bar"
-            }
+          addTags: ["foo"],
+          properties: {
+            foo: "bar"
           }
-        }).success(spy);
+        }, spy);
       });
 
       waitsFor(function(){
@@ -115,7 +110,7 @@ describe("geotriggers.js", function() {
       }, "Did not make request for device/update", 3000);
 
       runs(function(){
-        expect(spy).toHaveBeenCalledWithArgsLike({
+        expect(spy).toHaveBeenCalledWithArgsLike(null, {
           devices: [{
             deviceId: "xxx",
             tags: ["deviceTag", "foo"],
@@ -129,91 +124,66 @@ describe("geotriggers.js", function() {
       });
     });
 
-    it("should chain deferreds", function(){
-      var spy1 = jasmine.createSpy();
-      var spy2 = jasmine.createSpy();
-
-      runs(function(){
-        geotriggers.request("device/list").then(spy1).success(spy2);
-      });
-
-      waitsFor(function(){
-        return spy1.callCount || spy2.callCount;
-      }, "Did not run at least one callback", 3000);
-
-      runs(function(){
-        expect(spy1).toHaveBeenCalled();
-        expect(spy2).toHaveBeenCalled();
-      });
-    });
 
     it("should be able to update location", function(){
-      var successSpy = jasmine.createSpy("success");
-      var errorSpy = jasmine.createSpy("error");
+      var spy = jasmine.createSpy();
 
       runs(function(){
         geotriggers.request("location/update", {
-          params: {
-            locations: [{
-              "timestamp": "2012-05-09T16:03:53-0700",
-              "planet":    "earth",
-              "latitude":  45.51294827744629,
-              "longitude": -122.66232132911682,
-              "accuracy":  10.0,
-              "speed":     null,
-              "altitude":  0,
-              "bearing":   null,
-              "verticalAccuracy": null,
-              "properties": {}
-            }]
-          }
-        }).then(successSpy, errorSpy);
+          locations: [{
+            "timestamp": "2012-05-09T16:03:53-0700",
+            "planet":    "earth",
+            "latitude":  45.51294827744629,
+            "longitude": -122.66232132911682,
+            "accuracy":  10.0,
+            "speed":     null,
+            "altitude":  0,
+            "bearing":   null,
+            "verticalAccuracy": null,
+            "properties": {}
+          }]
+        }, spy);
       });
 
       waitsFor(function(){
-        return successSpy.callCount || errorSpy.callCount;
-      }, "Did not run at least one callback", 3000);
+        return spy.callCount;
+      }, "Did not run callback", 3000);
 
       runs(function(){
-        expect(errorSpy).not.toHaveBeenCalled();
-        expect(successSpy).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalled();
       });
     });
 
     it("should be able to create a trigger", function(){
-      var successSpy = jasmine.createSpy("success");
-      var errorSpy = jasmine.createSpy("error");
+      var spy = jasmine.createSpy();
 
       runs(function(){
-        geotriggers.request("trigger/create",{
-          params: {
-            condition: {
-              direction: "enter",
-              geo:  {
-                geojson: {
-                  type: "Polygon",
-                  coordinates: [
-                    [ [-122.65, 45.55], [-122.65, 45.50], [-122.62, 45.50], [-122.62, 45.55], [-122.65, 45.55] ]
-                  ]
-                }
-              }
-            },
-            action: {
-              notification:{
-                text: "At some random polygon in portland"
+        geotriggers.request("trigger/create", {
+          condition: {
+            direction: "enter",
+            geo:  {
+              geojson: {
+                type: "Polygon",
+                coordinates: [
+                  [ [-122.65, 45.55], [-122.65, 45.50], [-122.62, 45.50], [-122.62, 45.55], [-122.65, 45.55] ]
+                ]
               }
             }
+          },
+          action: {
+            notification:{
+              text: "At some random polygon in portland"
+            }
           }
-        }).then(successSpy, errorSpy);
+        }, spy);
       });
 
       waitsFor(function(){
-        return successSpy.callCount || errorSpy.callCount;
-      }, "Did not run at least one callback", 3000);
+        return spy.callCount;
+      }, "Did not run callback", 3000);
 
       runs(function(){
-        expect(errorSpy).not.toHaveBeenCalled();
-        expect(successSpy).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalled();
       });
     });
 
