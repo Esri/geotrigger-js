@@ -1,4 +1,4 @@
-describe("custom spec helpers", function(){
+xdescribe("custom spec helpers", function(){
 
   it("should match two objects with the same keys but different values", function(){
     expect({

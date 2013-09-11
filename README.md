@@ -10,6 +10,9 @@ A lightweight, dependency-free library for interacting with the Geotriggers plat
 * Handles authentication, persisting and refreshing sessions
 * AMD and Node support
 
+## Browser Support
+Geotriggers.js supports any browser that supports [CORS](http://caniuse.com/cors). IE 8 and 9 are not supported because of limitations with [XDomainRequest](http://blogs.msdn.com/b/ieinternals/archive/2010/05/13/xdomainrequest-restrictions-limitations-and-workarounds.aspx) particularly #4 and #7.
+
 # Config Options
 
 ```js
@@ -25,48 +28,42 @@ geotriggers = new Geotriggers.Session({
 });
 ```
 
-# Request Options
+# Request Method
 
+### Method Signature
 ```js
-geotriggers.request("trigger/list", {
-  params: {}, // the parameters object will be sent along with your request
-  callback: function(error, response, XHR){}, // a node style callback to be executed on completion
-});
+geotriggers.request(/*STRING*/ method_name, /*OBJECT*/ params, /*function*/ callback);
 ```
 
+### Example
 ```js
 geotriggers.request("trigger/create", {
-  params: {}, // the parameters object will be sent along with your request
-  callback: function(error, response, XHR){}, // a node style callback to be executed on completion
+  condition: {
+    direction: "enter",
+    geo:  {
+      geojson: {
+        type: "Polygon",
+        coordinates: [
+          [ [-122.65, 45.55], [-122.65, 45.50], [-122.62, 45.50], [-122.62, 45.55], [-122.65, 45.55] ]
+        ]
+      }
+    }
+  },
+  action: {
+    notification:{
+      text: "At some random polygon in portland"
+    }
+  }
+}, function(error, response, xhr){
+  // callback function
 });
 ```
-
 
 ```js
 geotriggers.request("location/last", {
-  params: {}, // the parameters object will be sent along with your request
-  callback: function(error, response, XHR){}, // a node style callback to be executed on completion
-});
-```
-
-# Deferreds
-
-geotriggers-js ships with its own deferred object built in. An instance of `Geotriggers.Deferred` will be returned by any method that makes an asynchronous request.
-
-Standard `then(successFunction, errorFunction)` is supported as well as jQuery style `success(function)` and `error(function)`;
-
-```js
-successFunction = function(data, XHR){};
-errorFunction = function(error, XHR){};
-
-geotriggers.request("trigger/list", options).then(successFunction, errorFunction);
-```
-
-```js
-geotriggers.request("trigger/list", options).success(function(data, XHR){
-  //deal with the data
-}).error(function(error, XHR){
-  //deal with the error
+  tags: ["customers"]
+}, function(error, response, XHR){
+  // callback function
 });
 ```
 
@@ -84,8 +81,8 @@ geotriggers = new Geotriggers.Session({
 });
 
 // do stuff with `geotriggers`
-geotriggers.request("device/list").success(function(deviceInfo){
-  console.log(deviceInfo);
+geotriggers.request("device/list", function(error, response, xhr){
+  console.log(response);
 });
 ```
 
@@ -142,20 +139,6 @@ var geotriggers = new Geotriggers.Session({
 });
 ```
 
-## Using with AMD
-
-You can also use geotriggers js as an AMD module. This is useful for frameworks and libraries that use AMD like require.js and dojo.
-
-```js
-require([
-  "geotriggers.js"
-], function(Geotriggers){
-  var geotriggers = new Geotriggers.Session({
-    applicationId: "XXX"
-  });
-})
-```
-
 # Anonymous usage
 
 If you don't have an `token` the Geotriggers SDK will automatically register an anonymous device with ArcGIS Online.
@@ -180,9 +163,9 @@ Once these are installed you can now run the tests with `grunt jasmine`.
 
 ## Building
 
-Make sure you have all the testing dependancies installed then run `grunt` from the command line. If the files lints and passes all the tests it will be concatenated and minified to the `dist` folder.
+Make sure you have all the testing dependancies installed then run `grunt build` from the command line.
 
 ## Todos
 
 * HTML5 geolocation helpers for `location/update`
-* Batching and deferred lists
+* Batching requests
