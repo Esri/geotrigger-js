@@ -13,7 +13,6 @@
 
 }(this, function() {
 
-  var version           = "0.0.3";
   var geotriggersUrl    = "https://geotrigger.arcgis.com/";
   var tokenUrl          = "https://arcgis.com/sharing/oauth2/token";
   var registerDeviceUrl = "https://arcgis.com/sharing/oauth2/registerDevice";
