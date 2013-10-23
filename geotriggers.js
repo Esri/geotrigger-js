@@ -42,6 +42,7 @@
   }
 
   function Session(options){
+    this._queue = [];
     this._requestQueue = [];
     this._events = {};
 
@@ -129,6 +130,10 @@
         this.persist();
       }
 
+      while(this._queue.length){
+        this._queue.shift().apply(this);
+      }
+
       while(this._requestQueue.length){
         this.request.apply(this, this._requestQueue.shift());
       }
@@ -175,6 +180,18 @@
         }
       }
     }
+  };
+
+  Session.prototype.queue = function(fn) {
+    var args = Array.prototype.slice.apply(arguments);
+
+    if (!this.token) {
+      this._queue.push(args);
+      this.refresh();
+      return;
+    }
+
+    fn.apply(this);
   };
 
   Session.prototype.request = function(method, params, callback){
