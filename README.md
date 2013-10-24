@@ -17,8 +17,8 @@ Geotriggers.js supports any browser that supports [CORS](http://caniuse.com/cors
 
 ```js
 geotriggers = new Geotriggers.Session({
-  applicationId: "XXX", // required or session - this is the application id from developers.arcigs.com
-  applicationSecret: "XXX", // optional - this will authenticate as your application with full permissions
+  clientId: "XXX", // required or session - this is the application id from developers.arcigs.com
+  clientSecret: "XXX", // optional - this will authenticate as your application with full permissions
   persistSession: true, // optional - will attempt to persist the session and reload it on future page loads
   preferLocalStorage: true, // if localstorage is available persist the session to local storage
   automaticRegistation: true // optional - when true this will automatically register a device with ArcGIS Online to get a token
@@ -77,7 +77,7 @@ This use case is ideal for single page javascript applications.
 // this will create a session persisted to localstorage or cookies that can be reloaded automatically every page load.
 // a new device will be registered with ArcGIS Online to get an access token
 geotriggers = new Geotriggers.Session({
-  applicationId: "XXX", // set your application id
+  clientId: "XXX", // set your application id
 });
 
 // do stuff with `geotriggers`
@@ -93,7 +93,7 @@ persistence yourself.
 
 ```js
 geotriggers = new Geotriggers.Session({
-  applicationId: "XXX", // set your application id
+  clientId: "XXX", // set your application id
 });
 
 // when you are ready to persist the session convert it to JSON
@@ -111,7 +111,7 @@ If you have an access token and a refresh token from another source, like your a
 
 ```js
 geotriggers = new Geotriggers.Session({
-  applicationId: "XXX", // set your application id
+  clientId: "XXX", // set your application id
   token: "XXX",
   refreshToken: "XXX",
   persistSession: false // dont persist the session, since you want to handle it yourself
@@ -126,7 +126,7 @@ By default the `persistSession` flag is set to false in node to prevent the libr
 var Geotriggers = require("geotriggers");
 
 var geotriggers = new Geotriggers.Session({
-  applicationId: "XXX"
+  clientId: "XXX"
 });
 
 // store this somewhere
@@ -135,7 +135,7 @@ var sessionInfo = geotriggers.toJSON();
 // restore the session later
 var geotriggers = new Geotriggers.Session({
   session: sessionInfo,
-  applicationId: "XXX"
+  clientId: "XXX"
 });
 ```
 
