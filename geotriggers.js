@@ -182,10 +182,8 @@
   };
 
   Session.prototype.queue = function(fn) {
-    var args = Array.prototype.slice.apply(arguments);
-
     if (!this.token) {
-      this._queue.push(args);
+      this._queue.push(fn);
       this.refresh();
       return;
     }
