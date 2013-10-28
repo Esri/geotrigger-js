@@ -51,7 +51,8 @@
       geotriggersUrl: geotriggersUrl,
       tokenUrl: tokenUrl,
       registerDeviceUrl: registerDeviceUrl,
-      automaticRegistation: true
+      automaticRegistation: true,
+      proxy: false
     };
 
     // set application id
@@ -204,6 +205,9 @@
     // create the url for the request
     var url = (geotriggersRequest) ? this.geotriggersUrl + method : method;
 
+    if (this.proxy) {
+      url = this.proxy + url;
+    }
 
     if(typeof params === "function"){
       callback = params;
