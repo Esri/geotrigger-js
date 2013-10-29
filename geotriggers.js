@@ -60,7 +60,7 @@
       throw new Error("Geotriggers.Session requires an `clientId` or a `session` parameter.");
     }
 
-    if(options.proxy && !CORS) {
+    if(!options.proxy && !CORS) {
       throw new Error("This browser does not support CORS and a proxy has not been set.");
     }
 
