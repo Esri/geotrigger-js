@@ -1,0 +1,24 @@
+{
+  "name": "geotriggers-js",
+  "version": "1.0.0",
+  "homepage": "https://github.com/esri/geotriggers-js",
+  "authors": [
+    "Patrick Arlt <patrick.arlt@gmail.com>"
+  ],
+  "description": "a small API client for the ArcGIS Geotrigger Service, works in Node and in the browser.",
+  "main": "geotriggers.min.js",
+  "keywords": [
+    "geotriggers",
+    "geoloqi",
+    "arcgis"
+  ],
+  "license": "Apache 2.0",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "spec"
+  ]
+}
