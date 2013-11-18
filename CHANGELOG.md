@@ -1,3 +1,14 @@
+# 0.0.4
+* Fix incorrect reference to deviceId
+* Add proxy support
+* Add `queue` method
+* Fix broken CORS check in IE 10
+
+# 0.0.3
+* Minor bugfixes.
+* Remove deferreds. All `request` now only accepts callbacks.
+* Remove context param from `request` to allow for other promise libaries ot promisify `request`
+
 # 0.0.2
 * Removes `session.get(method, options)` and `session.post(method, options)` methods. Use `session.request(method, options)` instead.
 * All requests now use POST to talk to the API.

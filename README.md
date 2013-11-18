@@ -2,170 +2,312 @@
 
 A lightweight, dependency-free library for interacting with the Geotriggers platform.
 
+1. [Features](#features)
+1. [Examples](#examples)
+  * [Authenticating as an application](#as-an-application-with-clientid-and-clientsecret)
+  * [Authenticating as an existing device](#as-an-existing-device)
+  * [Authenticating as a new device](#as-a-new-device) 
+1. [Documentation](#documentation)
+  1. [Geotriggers.Session(options)](#geotriggerssessionoptions)
+    * [Options](#session-options)
+    * [Methods](#session-methods)
+    * [Properties](#session-properties)
+    * [Events](#session-events)
+    * [Persisting Authentication](#persisting-authentication)
+    * [Expiring Tokens](#expiring-tokens)
+1. [Browser Support and Proxies](#browser-support)
+1. [Development Instructions](#development-instructions)
+1. [Resources](resources)
+1. [Issues](#issues)
+1. [Contributing](#contributing)
+1. [Licensing](#licensing)
+
 ## Features
 
 * CORS support
 * No dependencies
 * Clean, simple API
 * Handles authentication, persisting and refreshing sessions
-* AMD and Node support
+* Works in browsers and in Node.js
 
-## Browser Support
-Geotriggers.js supports any browser that supports [CORS](http://caniuse.com/cors). IE 8 and 9 are not supported because of limitations with [XDomainRequest](http://blogs.msdn.com/b/ieinternals/archive/2010/05/13/xdomainrequest-restrictions-limitations-and-workarounds.aspx) particularly #4 and #7.
+## Examples
 
-# Config Options
+### As an application with clientId and clientSecret
+
+The method is best for server side applications or any clint side application where you dont mind giving total access to your applicaiton to the user.
 
 ```js
-geotriggers = new Geotriggers.Session({
-  clientId: "XXX", // required or session - this is the application id from developers.arcigs.com
-  clientSecret: "XXX", // optional - this will authenticate as your application with full permissions
-  persistSession: true, // optional - will attempt to persist the session and reload it on future page loads
-  preferLocalStorage: true, // if localstorage is available persist the session to local storage
-  automaticRegistation: true // optional - when true this will automatically register a device with ArcGIS Online to get a token
-  token: "XXX" // if you have a token from a previous session (session.toJSON()) you can pass it in here
-  refreshToken: "XXX" // if you have a refresh token from a previous session (session.toJSON()) you can pass it in here
-  expiresOn: "XXX"  // if your token has an expiration date you should pass it in
+var geotriggers = new Geotriggers.Session({
+  clientId: "ABC",
+  clientSecret: "XZY"
+});
+
+geotriggers.request("trigger/list", {
+  tags: ["portland"]
+}, function(error, response, xhr){
+  console.log(error, response, xhr);
 });
 ```
 
-# Request Method
+**BE EXTEMELY CAREFUL EXPOSING YOUR CLIENT SECRET!** If a user gains access to your client secret they have access to your **ENTIRE** Geotriggers based application and can do whatever they want. As a result this is generally best for server side applications that can hide the `clientSecret` from potentially malicous users.
 
-### Method Signature
+### As an existing device
+
+If you have a `refreshToken` for a device you can pass that to create a new session. `token`, `expiresOn`, and `deviceId` are all optional but will give Geotriggers JS more information to work with so they should be passed if availble.
+
 ```js
-geotriggers.request(/*STRING*/ method_name, /*OBJECT*/ params, /*function*/ callback);
+var geotriggers = new Geotriggers.Session({
+  clientId: "ABC",
+  refreshToken: "A VALID REFRESH TOKEN FOR THE DEVICE",
+  token: "A TOKEN FOR THE DEVICE",
+  expiresOn: "THE TOKEN EXPIRATION DATE",
+  deviceId: "THE DEVICE ID"
+});
+
+geotriggers.request("device/info", function(error, response, xhr){
+  console.log(error, response, xhr);
+});
 ```
 
-### Example
+This kind of workflow would be idea for applications where users can edit their own triggers on the web. A sever would store the `refeshToken` and pass it to the page where a session could be initiated.
+
+### As a new device
+
+Geotriggers JS can also automatically register a new device for you. This approch is similar to the mobile SDKs for iOS and Android which will register an anonymous device that can access the API
+
 ```js
+var geotriggers = new Geotriggers.Session({
+  clientId: "ABC"
+});
+
+geotriggers.request("device/info", function(error, response, xhr){
+  console.log(error, response, xhr);
+});
+```
+
+## Documentation
+
+### Geotriggers.Session(options)
+
+the core object of Geotriggers JS is the `Session` object. You can itialize a session in a variety of way depending on the kind of application you are trying to create.
+
+* [As An Application](#as-an-application-with-clientid-and-clientsecret)
+* [As An Existing Device](#as-an-existing-device)
+* [As A New Device](#as-a-new-device) 
+
+#### Session Options
+
+Option | Type | Default | Description
+--- | --- | --- | ---
+`clientId` **Required** | `String` | `undefined` | The `clientId` for your application. To get a client is you need to [register an applicaiton](https://developers.arcgis.com/en/applications/#new) on the ArcGIS Developers website.
+`clientSecret` | `String` |`undefined` | The `clientSecret` for this application. If you set this this session be authenticated as your application with full permissions.
+`persistSession` | `Boolean` | `true` | If `true` Geotriggers will persist this sessiont o a cookie or localStorage depending on browser capabilities.
+`preferLocalStorage` | `Boolean` | `true` | If `true` the browser will prefer to use localStorage over cookies if available.
+`automaticRegistation` | `Boolean` | `true` | If `true` and there is no `refreshToken` or `clientSecret` passed a new device will be registered and used for this session.
+`refreshToken` | `String` | `undefined` | This should be the refresh token for the device. It will be used to get a new token if the passed `token` is expired or not passed.
+`token` | `String` | `undefined` | When authenticating as an existing device this can be set as a valid token for the device. If this is invalid the `refreshToken` will be used to get a new token.
+`expiresOn` | `Date` | `undefined` | The expiration date for `token`. Used to help determine if the `token` is valid.
+`proxy` | `String` | `undefined` | If you are using a proxy for IE 8 and 9 support this should be the path to your proxy. See [browser support] for more information.
+
+#### Session Methods
+
+##### Session.request(method, params, callback)
+
+This is the primary method for interacting with the Geotrigger Service. It accepts a `method` the corresponds with the method you would like to call on teh Geotrigger API. an optional object of `parameters` and finally a `callback` function.
+
+Before you can use request you will need a valid [`Geotriggers.Session`](#geotriggerssessionoptions) object.
+
+```js
+var geotriggers = new Geotriggers.Session({
+  clientId: "ABC",
+  clientSecret: "XZY"
+});
+```
+
+Now that you have a session you can use the `request` method.
+
+```js
+// list all triggers tagged "portland"
+geotriggers.request("trigger/list", {
+  tags: ["portland"]
+}, function(error, response, xhr){
+  console.log(error, response, xhr);
+});
+```
+
+```js
+// if you dont need to pass parameters you can omit the "parameters" object
+geotriggers.request("trigger/list", function(error, response, xhr){
+  console.log(error, response, xhr);
+});
+```
+
+```js
+// create a trigger
 geotriggers.request("trigger/create", {
   condition: {
     direction: "enter",
-    geo:  {
-      geojson: {
-        type: "Polygon",
-        coordinates: [
-          [ [-122.65, 45.55], [-122.65, 45.50], [-122.62, 45.50], [-122.62, 45.55], [-122.65, 45.55] ]
-        ]
-      }
+    geo: {
+      latitude: 45.5165,
+      longitude: -122.6764,
+      distance: 240
     }
   },
   action: {
-    notification:{
-      text: "At some random polygon in portland"
+    notification: {
+      text: "Welcome to Portland"
     }
   }
-}, function(error, response, xhr){
-  // callback function
+},function(error, response, xhr){
+  console.log(error, response, xhr);
 });
 ```
 
-```js
-geotriggers.request("location/last", {
-  tags: ["customers"]
-}, function(error, response, XHR){
-  // callback function
-});
-```
+##### Session.authenticated()
 
-# Examples
-
-## Using from a browser
-
-This use case is ideal for single page javascript applications.
+This function will check if a user is authenticated and has a token. It should be noted that this may return false in some cases like the following as Geotriggers JS is still getting a token.
 
 ```js
-// this will create a session persisted to localstorage or cookies that can be reloaded automatically every page load.
-// a new device will be registered with ArcGIS Online to get an access token
-geotriggers = new Geotriggers.Session({
-  clientId: "XXX", // set your application id
-});
-
-// do stuff with `geotriggers`
-geotriggers.request("device/list", function(error, response, xhr){
-  console.log(response);
-});
-```
-
-## Using with a server
-
-If you want to store session details in a database or associate them with your own user data you can handle session
-persistence yourself.
-
-```js
-geotriggers = new Geotriggers.Session({
-  clientId: "XXX", // set your application id
-});
-
-// when you are ready to persist the session convert it to JSON
-// Store this JSON object and use it to initalize your session later
-mySession = JSON.stringify(geotriggers.toJSON())
-
-// when you need to reinitialize a session make
-// a new session from the stored JSON in.
-geotriggers = new Geotriggers.Session(JSON.parse(mySession));
-```
-
-## Using with a refresh token and access token
-
-If you have an access token and a refresh token from another source, like your application's server you can initalize the Geotriggers library with it.
-
-```js
-geotriggers = new Geotriggers.Session({
-  clientId: "XXX", // set your application id
-  token: "XXX",
-  refreshToken: "XXX",
-  persistSession: false // dont persist the session, since you want to handle it yourself
-});
-```
-
-## Using with Node
-
-By default the `persistSession` flag is set to false in node to prevent the library from attempting to persist the session to a cookie or localStorage. You should use the `geotriggers.toJSON()` method to create a JSON object to persist and restore a saved session by passing your stored session later.
-
-```js
-var Geotriggers = require("geotriggers");
-
 var geotriggers = new Geotriggers.Session({
-  clientId: "XXX"
+  clientId: "ABC",
+  clientSecret: "XZY"
 });
 
-// store this somewhere
-var sessionInfo = geotriggers.toJSON();
+// technically geotriggers is still getting a valid token so its not authenticated
 
-// restore the session later
+geotriggers.authenticated() // false
+```
+
+If you want to run a  function as soon as a Session is authenticated you can use [`Session.queue`](sessionqueuefunction) method or listen to the `authentication:success` event.
+
+##### Session.queue(function)
+
+This will run the passed function right away if the session is authenticated or run it immediatly after authentication occurs.
+
+```js
+// create a new session by automatically registering a new device
 var geotriggers = new Geotriggers.Session({
-  session: sessionInfo,
-  clientId: "XXX"
+  clientId: "ABC"
+});
+
+// add an item to be called as soon as we have a new device
+geotriggers.queue(function(){
+  console.log(geotriggers.deviceId);
 });
 ```
 
-# Anonymous usage
+##### Session.refresh()
 
-If you don't have an `token` the Geotriggers SDK will automatically register an anonymous device with ArcGIS Online.
+Manually refresh the session and persist it to a cookie or localStorage if applicable. This is used internally and generally you will not have to call this method.
 
-This will get you an `token` and `refresh_token` for the new device. If `persistSession` is true this session will
-be persisted and reloaded on every page load so another device will not be created.
+##### Session.persist()
 
-## Node Tests
+Persist it to a cookie or localStorage. This is used internally and generally you will not have to call this method.
 
-If you want to run the node tests just `npm test`
+##### Session.destroy()
 
-## Browser Tests
+This will destory the cookie or localStorage item essentially logging the user out and destorying the token.
 
-Testing is done via [Grunt](http://gruntjs.com/) and [Phantom JS](http://phantomjs.org/). To install these just run...
+##### Session.on(event, callback)
 
-If you want to run the tests in a browser with `grunt` or `grunt jasmine` you will need to install Phantom JS and grunt.
+Used to listen to events on the session.
 
-* `npm install grunt-cli -g`
-* `brew install phantomjs`
+```js
+// create a new session by automatically registering a new device
+var geotriggers = new Geotriggers.Session({
+  clientId: "ABC"
+});
 
-Once these are installed you can now run the tests with `grunt jasmine`.
+// this will be called every time geotriggers gets new credentials
+geotriggers.on("authentication:success", function(){
+  console.log(geotriggers.deviceId);
+});
+```
 
-## Building
+##### Session.off(event, callback)
 
-Make sure you have all the testing dependancies installed then run `grunt build` from the command line.
+Remove bound events on the session.
 
-## Todos
+```js
+// this would remove the event we added above
+geotriggers.on("authentication:success", function(){
+  console.log(geotriggers.deviceId);
+});
+```
 
-* HTML5 geolocation helpers for `location/update`
-* Batching requests
+#### Session Properties
+
+Property | Description
+--- | ---
+`authenticatedAs` | Returns the type of authentication, either `application` if a `clientSecret` was passed or `device` if the sesson is for a device.
+`deviceId` | If the session is authenticated as a device this will be that devices ID.
+`key` | The unique key for persisting the session. Will generally looks like `_geotriggers_{{device|application}}_{{clientId}}`.
+`refreshToken` | If the session is authenticated as a device this be the current refresh token.
+`token` | The token for this session.
+
+#### Session Events
+
+Event Name | Description
+--- | ---
+`authentication:success` | Fired when Geotriggers has successfully authenticated as a device or application.
+`authentication:error` | Fired when something went wrong with authenticaing or reauthenticing.
+
+#### Persisting Authentication
+
+Geotriggers JS will attempt to keep a session persisted for you. When you create a new `Session` it will check to see is a session already exists for the passed `clientId` ina  cookie or in localStorage if a session exists Geotriggers JS will use that session.
+
+To disable this behavior set `persistSession` to false.
+
+By default Geotriggers JS will try to store the session in localStorage. If you would prefer to use cookies to store your session set `preferLocalStorage` to false.
+
+#### Expiring Tokens
+
+Geotriggers JS will handle when your token expires and automatically get a new token for you and rerun your request. You can listen to the `authentication:success` and `authentication:error` events to know when Geotriggers JS is requesting new authentication.
+
+## Browser Support
+Geotriggers.js supports any browser that supports [CORS](http://caniuse.com/cors). IE 8 and 9 are  supported but requires the use a proxy to work around limitations with [XDomainRequest](http://blogs.msdn.com/b/ieinternals/archive/2010/05/13/xdomainrequest-restrictions-limitations-and-workarounds.aspx).
+
+A Node.js proxy is supplied in the `proxy` folder. To create your own proxy to support IE 8 and 9 you can use that that proxy as a sample. Your proxy will need to foreward requests POST requests like `/proxy/http://geotriggers.arcgis.com/trigger/list` to `http://geotriggers.arcgis.com/trigger/list` with all headers intact.
+
+## Development Instructions
+
+1. [Fork and clone Geotriggers JS](https://help.github.com/articles/fork-a-repo)
+1. `cd` into the `geotriggers-js` folder
+1. Instal the dependancies with `npm install`
+1. Run the tests with `npm test` or `grunt test`
+1. Make your changes and create a [pull request](https://help.github.com/articles/creating-a-pull-request)
+
+## Resources
+
+* [ArcGIS for Developers](https://developers.arcgis.com)
+* [Geotrigger Service](https://developers.arcgis.com/en/geotriggers)
+* [@esripdx](http://twitter.com/esri)
+
+## Issues
+
+Find a bug or want to request a new feature?  Please let us know by submitting an issue.
+
+## Contributing
+
+Esri welcomes contributions from anyone and everyone. Please see our [guidelines for contributing](https://github.com/esri/contributing).
+
+
+## Licensing
+Copyright 2013 Esri
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+A copy of the license is available in the repository's [license.txt]( https://raw.github.com/Esri/esri-leaflet/master/license.txt) file.
+
+[](Esri Tags: Geotriggers)
+[](Esri Language: JavaScript)

@@ -4,8 +4,7 @@
   "description": "Small client for interacting with the ArcGIS Geotriggers API.",
   "main": "geotriggers.js",
   "dependencies": {
-    "xmlhttprequest": "~1.5.0",
-    "grunt-complexity": "~0.1.2"
+    "xmlhttprequest": "~1.5.0"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
@@ -13,7 +12,8 @@
     "grunt-contrib-uglify": "~0.2.0",
     "grunt-contrib-watch": "~0.3.1",
     "grunt-karma": "~0.4.5",
-    "grunt-jasmine-node": "https://github.com/magicmoose/grunt-jasmine-node/tarball/master"
+    "grunt-jasmine-node": "https://github.com/magicmoose/grunt-jasmine-node/tarball/master",
+    "grunt-complexity": "~0.1.2"
   },
   "scripts": {
     "test": "grunt test"
@@ -28,5 +28,5 @@
     "Jerry Sievert <jsievert@esri.com> (http://legitimatesounding.com)",
     "Nate Goldman <ngoldman@esri.com> (http://ngoldman.me)"
   ],
-  "license": "MIT"
+  "license": "Apache License – 2.0"
 }

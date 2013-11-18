@@ -96,7 +96,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', ['jshint', 'test']);
   grunt.registerTask('build', ['default', 'uglify']);
-  grunt.registerTask('test', ['jasmine_node','karma:coverage']);
+  grunt.registerTask('test', ['jasmine_node', 'karma:coverage']);
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-jshint');
