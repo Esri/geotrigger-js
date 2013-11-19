@@ -17,7 +17,11 @@
   var tokenUrl          = "https://arcgis.com/sharing/oauth2/token";
   var registerDeviceUrl = "https://arcgis.com/sharing/oauth2/registerDevice";
   var exports           = {};
-  var CORS              = !!(window.XMLHttpRequest && 'withCredentials' in new XMLHttpRequest());
+  var CORS              = true;
+
+  if (typeof window === "object") {
+    CORS = !!(window.XMLHttpRequest && 'withCredentials' in new XMLHttpRequest());
+  }
 
   if (!Function.prototype.bind) {
     Function.prototype.bind = function (oThis) {
