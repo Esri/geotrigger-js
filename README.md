@@ -1,6 +1,6 @@
-# geotriggers.js
+# geotrigger.js
 
-An API client for the [ArcGIS Geotriggers Service](https://developers.arcgis.com/en/geotrigger-service/).
+An API client for the [ArcGIS Geotrigger Service](https://developers.arcgis.com/en/geotrigger-service/).
 
 1. [Features](#features)
 1. [Examples](#examples)
