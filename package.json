@@ -1,6 +1,6 @@
 {
   "name": "geotriggers-js",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "description": "Small client for interacting with the ArcGIS Geotriggers API.",
   "main": "geotriggers.js",
   "dependencies": {
