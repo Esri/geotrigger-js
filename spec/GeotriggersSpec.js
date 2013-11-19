@@ -1,5 +1,5 @@
 if(typeof module === "object"){
-  var Geotriggers = require("../geotriggers");
+  var Geotrigger = require("../geotrigger");
 }
 
 var ClientId = "ABC";
@@ -9,7 +9,7 @@ describe("geotriggers.js", function() {
 
   it("should throw an error if initialized without an application_id or session", function(){
     expect(function(){
-      var geotriggers = new Geotriggers.Session();
+      var geotriggers = new Geotrigger.Session();
     }).toThrow();
   });
 
@@ -19,7 +19,7 @@ describe("geotriggers.js", function() {
     var geotriggers;
 
     runs(function(){
-      geotriggers = new Geotriggers.Session({
+      geotriggers = new Geotrigger.Session({
         clientId: ClientId,
         clientSecret: ClientSecret,
         persistSession: false
@@ -42,7 +42,7 @@ describe("geotriggers.js", function() {
     var geotriggers;
 
     runs(function(){
-      geotriggers = new Geotriggers.Session({
+      geotriggers = new Geotrigger.Session({
         clientId: ClientId,
         persistSession: false
       });
@@ -61,7 +61,7 @@ describe("geotriggers.js", function() {
   });
 
   describe("api request methods", function(){
-    var geotriggers = new Geotriggers.Session({
+    var geotriggers = new Geotrigger.Session({
       clientId: ClientId,
       persistSession: false
     });

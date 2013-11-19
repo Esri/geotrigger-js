@@ -9,6 +9,7 @@
   // Browser Global.
   if(typeof window === "object") {
     root.Geotriggers = factory();
+    root.Geotrigger = factory();
   }
 
 }(this, function() {

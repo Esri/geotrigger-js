@@ -26,10 +26,10 @@ module.exports = function(grunt) {
           exports: true
         }
       },
-      all: ['Gruntfile.js', 'geotriggers.js']
+      all: ['Gruntfile.js', 'geotrigger.js']
     },
     watch: {
-      files: ['Gruntfile.js', 'geotriggers.js'],
+      files: ['Gruntfile.js', 'geotrigger.js'],
       tasks: 'default'
     },
     uglify: {
@@ -41,7 +41,7 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          'geotriggers.min.js': ['geotriggers.js']
+          'geotrigger.min.js': ['geotrigger.js']
         }
       }
     },
@@ -71,7 +71,7 @@ module.exports = function(grunt) {
       coverage: {
         configFile: 'karma.conf.js',
         preprocessors:{
-          'geotriggers.js': 'coverage'
+          'geotrigger.js': 'coverage'
         },
         coverageReporter: {
           type : 'html',
@@ -82,7 +82,7 @@ module.exports = function(grunt) {
 
     complexity: {
       generic: {
-        src: ['geotriggers.js'],
+        src: ['geotrigger.js'],
         options: {
           jsLintXML: 'reports/complexity.xml', // create XML JSLint-like report
           errorsOnly: false, // show only maintainability errors
