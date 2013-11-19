@@ -8,7 +8,7 @@ An API client for the [ArcGIS Geotriggers Service](https://developers.arcgis.com
   * [Authenticating as an existing device](#as-an-existing-device)
   * [Authenticating as a new device](#as-a-new-device) 
 1. [Documentation](#documentation)
-  1. [Geotriggers.Session(options)](#geotriggerssessionoptions)
+  1. [Geotrigger.Session(options)](#geotriggerssessionoptions)
     * [Options](#session-options)
     * [Methods](#session-methods)
     * [Properties](#session-properties)
@@ -36,7 +36,7 @@ An API client for the [ArcGIS Geotriggers Service](https://developers.arcgis.com
 The method is best for server side applications or any clint side application where you dont mind giving total access to your applicaiton to the user.
 
 ```js
-var geotriggers = new Geotriggers.Session({
+var geotriggers = new Geotrigger.Session({
   clientId: "ABC",
   clientSecret: "XZY"
 });
@@ -55,7 +55,7 @@ geotriggers.request("trigger/list", {
 If you have a `refreshToken` for a device you can pass that to create a new session. `token`, `expiresOn`, and `deviceId` are all optional but will give Geotriggers JS more information to work with so they should be passed if availble.
 
 ```js
-var geotriggers = new Geotriggers.Session({
+var geotriggers = new Geotrigger.Session({
   clientId: "ABC",
   refreshToken: "A VALID REFRESH TOKEN FOR THE DEVICE",
   token: "A TOKEN FOR THE DEVICE",
@@ -75,7 +75,7 @@ This kind of workflow would be idea for applications where users can edit their 
 Geotriggers JS can also automatically register a new device for you. This approch is similar to the mobile SDKs for iOS and Android which will register an anonymous device that can access the API
 
 ```js
-var geotriggers = new Geotriggers.Session({
+var geotriggers = new Geotrigger.Session({
   clientId: "ABC"
 });
 
@@ -86,7 +86,7 @@ geotriggers.request("device/info", function(error, response, xhr){
 
 ## Documentation
 
-### Geotriggers.Session(options)
+### Geotrigger.Session(options)
 
 the core object of Geotriggers JS is the `Session` object. You can itialize a session in a variety of way depending on the kind of application you are trying to create.
 
@@ -114,10 +114,10 @@ Option | Type | Default | Description
 
 This is the primary method for interacting with the Geotrigger Service. It accepts a `method` the corresponds with the method you would like to call on teh Geotrigger API. an optional object of `parameters` and finally a `callback` function.
 
-Before you can use request you will need a valid [`Geotriggers.Session`](#geotriggerssessionoptions) object.
+Before you can use request you will need a valid [`Geotrigger.Session`](#geotriggerssessionoptions) object.
 
 ```js
-var geotriggers = new Geotriggers.Session({
+var geotriggers = new Geotrigger.Session({
   clientId: "ABC",
   clientSecret: "XZY"
 });
@@ -167,7 +167,7 @@ geotriggers.request("trigger/create", {
 This function will check if a user is authenticated and has a token. It should be noted that this may return false in some cases like the following as Geotriggers JS is still getting a token.
 
 ```js
-var geotriggers = new Geotriggers.Session({
+var geotriggers = new Geotrigger.Session({
   clientId: "ABC",
   clientSecret: "XZY"
 });
@@ -185,7 +185,7 @@ This will run the passed function right away if the session is authenticated or 
 
 ```js
 // create a new session by automatically registering a new device
-var geotriggers = new Geotriggers.Session({
+var geotriggers = new Geotrigger.Session({
   clientId: "ABC"
 });
 
@@ -213,7 +213,7 @@ Used to listen to events on the session.
 
 ```js
 // create a new session by automatically registering a new device
-var geotriggers = new Geotriggers.Session({
+var geotriggers = new Geotrigger.Session({
   clientId: "ABC"
 });
 

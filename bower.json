@@ -1,7 +1,7 @@
 {
   "name": "geotrigger-js",
   "version": "0.1.0",
-  "homepage": "https://github.com/esri/geotriggers-js",
+  "homepage": "https://github.com/esri/geotrigger-js",
   "authors": [
     "Patrick Arlt <patrick.arlt@gmail.com>"
   ],
