@@ -1,6 +1,6 @@
 # geotriggers.js
 
-A lightweight, dependency-free library for interacting with the Geotriggers platform.
+An API client for the [ArcGIS Geotriggers Service](https://developers.arcgis.com/en/geotrigger-service/).
 
 1. [Features](#features)
 1. [Examples](#examples)
@@ -26,7 +26,6 @@ A lightweight, dependency-free library for interacting with the Geotriggers plat
 
 * CORS support
 * No dependencies
-* Clean, simple API
 * Handles authentication, persisting and refreshing sessions
 * Works in browsers and in Node.js
 
@@ -280,7 +279,7 @@ A Node.js proxy is supplied in the `proxy` folder. To create your own proxy to s
 ## Resources
 
 * [ArcGIS for Developers](https://developers.arcgis.com)
-* [Geotrigger Service](https://developers.arcgis.com/en/geotriggers)
+* [ArcGIS Geotrigger Service](https://developers.arcgis.com/en/geotrigger-service/)
 * [@esripdx](http://twitter.com/esri)
 
 ## Issues

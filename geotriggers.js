@@ -299,6 +299,7 @@
 
   Session.prototype.persist = function() {
     var value = {};
+    if(this.clientId){ value.clientId = this.clientId; }
     if(this.clientSecret){ value.clientSecret = this.clientSecret; }
     if(this.token){ value.token = this.token; }
     if(this.refreshToken){ value.refreshToken = this.refreshToken; }

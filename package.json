@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/geoloqi/geoloqi-js-2.git"
+    "url": "git@github.com:Esri/geotriggers-js.git"
   },
   "author": "Patrick Arlt <parlt@esri.com> (http://patrickarlt.com)",
   "contributors": [
@@ -28,5 +28,5 @@
     "Jerry Sievert <jsievert@esri.com> (http://legitimatesounding.com)",
     "Nate Goldman <ngoldman@esri.com> (http://ngoldman.me)"
   ],
-  "license": "Apache License – 2.0"
+  "license": "Apache 2.0"
 }
