@@ -5,7 +5,7 @@ if(typeof module === "object"){
 var ClientId = "ABC";
 var ClientSecret = "XYZ";
 
-describe("geotriggers.js", function() {
+describe("geotrigger.js", function() {
 
   it("should throw an error if initialized without an application_id or session", function(){
     expect(function(){

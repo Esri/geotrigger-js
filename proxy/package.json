@@ -1,7 +1,7 @@
 {
-  "name": "geotriggers-proxy",
+  "name": "geotrigger-proxy",
   "version": "0.0.1",
-  "description": "Proxy for Geotriggers.js to support legacy browsers",
+  "description": "Proxy for Geotrigger.js to support legacy browsers",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

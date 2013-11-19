@@ -57,7 +57,7 @@
 
     // set application id
     if(!options || !options.clientId) {
-      throw new Error("Geotriggers.Session requires an `clientId` or a `session` parameter.");
+      throw new Error("Geotrigger.Session requires an `clientId` or a `session` parameter.");
     }
 
     if(!options.proxy && !CORS) {
