@@ -8,9 +8,9 @@ basePath = './';
 files = [
   JASMINE,
   JASMINE_ADAPTER,
-  {pattern: 'geotriggers.js'},
+  {pattern: 'geotrigger.js'},
   {pattern: 'spec/SpecHelpers.js'},
-  {pattern: 'spec/GeotriggersSpec.js'}
+  {pattern: 'spec/GeotriggerSpec.js'}
 ];
 
 // list of files to exclude
