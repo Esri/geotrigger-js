@@ -1,3 +1,15 @@
+# 0.1.3
+* Fix bug where http errors would not be handled
+
+# 0.1.2
+* First public release
+
+# 0.1.1
+* Small bugfixes
+
+# 0.1.0
+* Bump verion to prep for beta release of the Geotrigger Service
+
 # 0.0.4
 * Fix incorrect reference to deviceId
 * Add proxy support

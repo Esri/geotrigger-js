@@ -271,6 +271,7 @@
         type: "http_error",
         message: errorMessage
       };
+      callback(error, null, httpRequest);
     }.bind(this);
 
     // callback for handling state change
