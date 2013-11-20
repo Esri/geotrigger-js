@@ -8,7 +8,7 @@
 * Small bugfixes
 
 # 0.1.0
-* Bump verion to prep for beat release of the Geotrigger Service
+* Bump verion to prep for beta release of the Geotrigger Service
 
 # 0.0.4
 * Fix incorrect reference to deviceId
