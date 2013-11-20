@@ -31,9 +31,9 @@ An API client for the [ArcGIS Geotrigger Service](https://developers.arcgis.com/
 
 ## Examples
 
-### As an application with clientId and clientSecret
+### As an application with `clientId` and `clientSecret`
 
-The method is best for server side applications or any clint side application where you dont mind giving total access to your applicaiton to the user.
+This method is best for server-side applications, or any client-side application where you don't mind giving total access to your application to the user.
 
 ```js
 var geotriggers = new Geotrigger.Session({
@@ -48,11 +48,11 @@ geotriggers.request("trigger/list", {
 });
 ```
 
-**BE EXTEMELY CAREFUL EXPOSING YOUR CLIENT SECRET!** If a user gains access to your client secret they have access to your **ENTIRE** Geotrigger based application and can do whatever they want. As a result this is generally best for server side applications that can hide the `clientSecret` from potentially malicous users.
+**BE EXTEMELY CAREFUL EXPOSING YOUR CLIENT SECRET!** If a user gains access to your client secret they have access to your **ENTIRE** Geotrigger based application and can do whatever they want. As a result this is generally best for server-side applications that can hide the `clientSecret` from potentially malicious users.
 
 ### As an existing device
 
-If you have a `refreshToken` for a device you can pass that to create a new session. `token`, `expiresOn`, and `deviceId` are all optional but will give Geotrigger JS more information to work with so they should be passed if availble.
+If you have a `refreshToken` for a device, you can pass that to create a new session. `token`, `expiresOn`, and `deviceId` are all optional but will give Geotrigger JS more information to work with so they should be passed if availble.
 
 ```js
 var geotriggers = new Geotrigger.Session({
@@ -68,11 +68,11 @@ geotriggers.request("device/info", function(error, response, xhr){
 });
 ```
 
-This kind of workflow would be idea for applications where users can edit their own triggers on the web. A sever would store the `refeshToken` and pass it to the page where a session could be initiated.
+This kind of workflow would be ideal for applications where users can edit their own triggers on the web. A server would store the `refeshToken` and pass it to the page where a session could be initiated.
 
 ### As a new device
 
-Geotrigger JS can also automatically register a new device for you. This approch is similar to the mobile SDKs for iOS and Android which will register an anonymous device that can access the API
+Geotrigger JS can also automatically register a new device for you. This approch is similar to the mobile SDKs for iOS and Android which will register an anonymous device that can access the API.
 
 ```js
 var geotriggers = new Geotrigger.Session({
@@ -88,7 +88,7 @@ geotriggers.request("device/info", function(error, response, xhr){
 
 ### Geotrigger.Session(options)
 
-the core object of Geotrigger JS is the `Session` object. You can itialize a session in a variety of way depending on the kind of application you are trying to create.
+The core object of Geotrigger JS is the `Session` object. You can initialize a session in a variety of ways depending on the kind of application you are trying to create.
 
 * [As An Application](#as-an-application-with-clientid-and-clientsecret)
 * [As An Existing Device](#as-an-existing-device)
@@ -98,15 +98,15 @@ the core object of Geotrigger JS is the `Session` object. You can itialize a ses
 
 Option | Type | Default | Description
 --- | --- | --- | ---
-`clientId` **Required** | `String` | `undefined` | The `clientId` for your application. To get a client is you need to [register an applicaiton](https://developers.arcgis.com/en/applications/#new) on the ArcGIS Developers website.
-`clientSecret` | `String` |`undefined` | The `clientSecret` for this application. If you set this this session be authenticated as your application with full permissions.
+`clientId` **Required** | `String` | `undefined` | The `clientId` for your application. To get a client ID you need to [register an application](https://developers.arcgis.com/en/applications/#new) on the ArcGIS Developers website.
+`clientSecret` | `String` |`undefined` | The `clientSecret` for this application. If set, this session will be authenticated as your application with full permissions.
 `persistSession` | `Boolean` | `true` | If `true` Geotrigger JS will persist this session to a cookie or localStorage depending on browser capabilities.
 `preferLocalStorage` | `Boolean` | `true` | If `true` the browser will prefer to use localStorage over cookies if available.
 `automaticRegistation` | `Boolean` | `true` | If `true` and there is no `refreshToken` or `clientSecret` passed a new device will be registered and used for this session.
-`refreshToken` | `String` | `undefined` | This should be the refresh token for the device. It will be used to get a new token if the passed `token` is expired or not passed.
+`refreshToken` | `String` | `undefined` | This should be the refresh token for the device. It will be used to get a new token if the original `token` is expired or not passed.
 `token` | `String` | `undefined` | When authenticating as an existing device this can be set as a valid token for the device. If this is invalid the `refreshToken` will be used to get a new token.
 `expiresOn` | `Date` | `undefined` | The expiration date for `token`. Used to help determine if the `token` is valid.
-`proxy` | `String` | `undefined` | If you are using a proxy for IE 8 and 9 support this should be the path to your proxy. See [browser support] for more information.
+`proxy` | `String` | `undefined` | If you are using a proxy for IE 8 and 9 support this should be the path to your proxy. See [browser support](#browser-support) for more information.
 
 #### Session Methods
 
@@ -164,7 +164,7 @@ geotriggers.request("trigger/create", {
 
 ##### Session.authenticated()
 
-This function will check if a user is authenticated and has a token. It should be noted that this may return false in some cases like the following as Geotrigger JS is still getting a token.
+This function will check if a user is authenticated and has a token. It should be noted that this may return false in some cases (like the sample code below) as Geotrigger JS is still getting a token.
 
 ```js
 var geotriggers = new Geotrigger.Session({
@@ -177,11 +177,11 @@ var geotriggers = new Geotrigger.Session({
 geotriggers.authenticated() // false
 ```
 
-If you want to run a  function as soon as a Session is authenticated you can use [`Session.queue`](sessionqueuefunction) method or listen to the `authentication:success` event.
+If you want to run a function as soon as a Session is authenticated you can use the [`Session.queue`](#sessionqueuefunction) method or listen to the `authentication:success` event.
 
 ##### Session.queue(function)
 
-This will run the passed function right away if the session is authenticated or run it immediatly after authentication occurs.
+This will run the passed function right away if the session is authenticated or run it immediately after authentication occurs.
 
 ```js
 // create a new session by automatically registering a new device
@@ -239,7 +239,7 @@ geotriggers.on("authentication:success", function(){
 Property | Description
 --- | ---
 `authenticatedAs` | Returns the type of authentication, either `application` if a `clientSecret` was passed or `device` if the sesson is for a device.
-`deviceId` | If the session is authenticated as a device this will be that devices ID.
+`deviceId` | If the session is authenticated as a device this will be that device's ID.
 `key` | The unique key for persisting the session. Will generally looks like `_geotriggers_{{device|application}}_{{clientId}}`.
 `refreshToken` | If the session is authenticated as a device this be the current refresh token.
 `token` | The token for this session.
@@ -266,25 +266,25 @@ Geotrigger JS will handle when your token expires and automatically get a new to
 ## Browser Support
 Geotrigger.js supports any browser that supports [CORS](http://caniuse.com/cors). IE 8 and 9 are  supported but requires the use a proxy to work around limitations with [XDomainRequest](http://blogs.msdn.com/b/ieinternals/archive/2010/05/13/xdomainrequest-restrictions-limitations-and-workarounds.aspx).
 
-A Node.js proxy is supplied in the `proxy` folder. To create your own proxy to support IE 8 and 9 you can use that that proxy as a sample. Your proxy will need to foreward requests POST requests like `/proxy/http://geotrigger.arcgis.com/trigger/list` to `http://geotrigger.arcgis.com/trigger/list` with all headers intact.
+A Node.js proxy is supplied in the `proxy` folder. To create your own proxy to support IE 8 and 9 you can use that proxy as a sample implementation. Your proxy will need to forward POST requests like `/proxy/http://geotrigger.arcgis.com/trigger/list` to `http://geotrigger.arcgis.com/trigger/list` with all headers intact.
 
 ## Development Instructions
 
 1. [Fork and clone Geotrigger JS](https://help.github.com/articles/fork-a-repo)
 1. `cd` into the `geotrigger-js` folder
-1. Instal the dependancies with `npm install`
-1. Run the tests with `npm test` or `grunt test`
+1. Install dependencies with `npm install`
+1. Run tests with `npm test` or `grunt test`
 1. Make your changes and create a [pull request](https://help.github.com/articles/creating-a-pull-request)
 
 ## Resources
 
 * [ArcGIS for Developers](https://developers.arcgis.com)
 * [ArcGIS Geotrigger Service](https://developers.arcgis.com/en/geotrigger-service/)
-* [@esripdx](http://twitter.com/esri)
+* [@esripdx](http://twitter.com/esripdx)
 
 ## Issues
 
-Find a bug or want to request a new feature?  Please let us know by submitting an issue.
+Find a bug or want to request a new feature? Please let us know by submitting an issue.
 
 ## Contributing
 
@@ -298,7 +298,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-   http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
