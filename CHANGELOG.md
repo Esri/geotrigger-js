@@ -1,3 +1,6 @@
+# 0.1.4
+* Fix bug where http errors without JSON responses would not be handled
+
 # 0.1.3
 * Fix bug where http errors would not be handled
 
