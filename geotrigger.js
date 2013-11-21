@@ -266,11 +266,14 @@
 
     // callback for handling an http error
     var handleErrorResponse = function(){
-      var errorMessage = JSON.parse(httpRequest.responseText);
       var error = {
         type: "http_error",
-        message: errorMessage
       };
+      try {
+        error.message = JSON.parse(httpRequest.responseText);
+      } catch (e){
+        error.message = "http error and cound not parse response as JSON";
+      }
       callback(error, null, httpRequest);
     }.bind(this);
 
