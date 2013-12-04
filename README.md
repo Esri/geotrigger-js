@@ -177,11 +177,11 @@ var geotriggers = new Geotrigger.Session({
 geotriggers.authenticated() // false
 ```
 
-If you want to run a function as soon as a Session is authenticated you can use the [`Session.queue`](#sessionqueuefunction) method or listen to the `authentication:success` event.
+If you want to run a function as soon as a Session is authenticated you can use the [`Session.queue`](#sessionqueuefunction) method or listen to the `authentication:success` and `authentication:restored` events.
 
-##### Session.queue(function)
+##### Session.queue(callback)
 
-This will run the passed function right away if the session is authenticated or run it immediately after authentication occurs.
+Accepts a function to be called after authentication has succeeded or a session has been restored from localStorage or cookies. Can be called multiple times.
 
 ```js
 // create a new session by automatically registering a new device
@@ -249,11 +249,12 @@ Property | Description
 Event Name | Description
 --- | ---
 `authentication:success` | Fired when Geotrigger JS has successfully authenticated as a device or application.
+`authentication:restored` | Fired when Geotrigger JS has successfully restored a previous session from localStorage or cookies.
 `authentication:error` | Fired when something went wrong with authenticaing or reauthenticing.
 
 #### Persisting Authentication
 
-Geotrigger JS will attempt to keep a session persisted for you. When you create a new `Session` it will check to see is a session already exists for the passed `clientId` ina  cookie or in localStorage if a session exists Geotrigger JS will use that session.
+Geotrigger JS will attempt to keep a session persisted for you. When you create a new `Session` it will check to see is a session already exists for the passed `clientId` in a cookie or in localStorage. If a session does exist, Geotrigger JS will use that session.
 
 To disable this behavior set `persistSession` to false.
 
