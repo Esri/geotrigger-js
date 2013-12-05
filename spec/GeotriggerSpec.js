@@ -1,19 +1,20 @@
 if(typeof module === "object"){
   var Geotrigger = require("../geotrigger");
+  var config = require("./config");
 }
 
-var ClientId = "ABC";
-var ClientSecret = "XYZ";
+var ClientId = config.clientId;
+var ClientSecret = config.clientSecret;
 
 describe("geotrigger.js", function() {
 
-  it("should throw an error if initialized without an application_id or session", function(){
+  it("should throw an error if initialized without a client id or session", function(){
     expect(function(){
       var geotriggers = new Geotrigger.Session();
     }).toThrow();
   });
 
-  it("should fire an `authenticated` event after the initializes successfully with an application id and secret", function(){
+  it("should fire an `authenticated` event after initializing successfully with a client id and secret", function(){
 
     var spy = jasmine.createSpy();
     var geotriggers;
@@ -37,7 +38,7 @@ describe("geotrigger.js", function() {
     });
   });
 
-  it("should fire an `authenticated` event after the initializes successfully with an application id", function(){
+  it("should fire an `authenticated` event after initializing successfully with a client id", function(){
     var spy = jasmine.createSpy();
     var geotriggers;
 
@@ -93,7 +94,7 @@ describe("geotrigger.js", function() {
       });
     });
 
-    it("should update a device and use a deferred", function(){
+    it("should be able to update a device", function(){
       var spy = jasmine.createSpy();
 
       runs(function(){
