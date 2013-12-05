@@ -274,6 +274,7 @@ A Node.js proxy is supplied in the `proxy` folder. To create your own proxy to s
 1. `cd` into the `geotrigger-js` folder
 1. Install dependencies with `npm install`
 1. Run tests with `npm test` or `grunt test`
+    * first `cp spec/config.js.example spec/config.js` and add valid `clientId` & `clientSecret`
 1. Make your changes and create a [pull request](https://help.github.com/articles/creating-a-pull-request)
 
 ## Resources

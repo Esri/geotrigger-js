@@ -9,6 +9,7 @@ files = [
   JASMINE,
   JASMINE_ADAPTER,
   {pattern: 'geotrigger.js'},
+  {pattern: 'spec/config.js'},
   {pattern: 'spec/SpecHelpers.js'},
   {pattern: 'spec/GeotriggerSpec.js'}
 ];

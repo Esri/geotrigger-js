@@ -1,0 +1,22 @@
+(function (root, factory) {
+
+  // Node.
+  if (typeof module === 'object' && typeof module.exports === 'object') {
+    exports = module.exports = factory();
+  }
+
+  // Browser Global.
+  if (typeof window === 'object') {
+    root.config = factory();
+  }
+
+}(this, function() {
+
+  // add your clientId and clientSecret here
+  var config = {
+    "clientId": "ABC",
+    "clientSecret": "XYZ"
+  };
+
+  return config;
+}));
