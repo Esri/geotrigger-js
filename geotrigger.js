@@ -86,7 +86,14 @@
 
     // if there is an access token and it is after when the token expires or there is no access token
     if((this.token && (Date.now() > new Date(this.expiresOn).getTime())) || !this.token){
+      // remove token to prevent queued functions from firing
+      delete this.token;
       this.refresh();
+    }
+
+    // if token exists, is not expired, and session has been restored
+    else if (this.persistSession) {
+      this.emit("authentication:restored");
     }
   }
 
@@ -118,8 +125,8 @@
     this.request(url, params, function(error, response, xhr){
       this.refreshing = false;
 
-      if(error){
-        this.emit("authentication:error", error);
+      if (error) {
+        this.emit("authentication:error", error, response, xhr);
         return;
       }
 
@@ -138,15 +145,15 @@
         this.persist();
       }
 
-      while(this._queue.length){
+      while (this._queue.length) {
         this._queue.shift().apply(this);
       }
 
-      while(this._requestQueue.length){
+      this.emit("authentication:success");
+
+      while (this._requestQueue.length) {
         this.request.apply(this, this._requestQueue.shift());
       }
-
-      this.emit("authentication:success");
     }.bind(this));
   };
 
@@ -161,11 +168,14 @@
   };
 
   Session.prototype.on = function(type, listener){
-    if (typeof this._events[type] === "undefined"){
-      this._events[type] = [];
-    }
+    var types = type.split(' ');
 
-    this._events[type].push(listener);
+    for (var i=0; i < types.length; i++) {
+      if (typeof this._events[types[i]] === "undefined") {
+        this._events[types[i]] = [];
+      }
+      this._events[types[i]].push(listener);
+    }
   };
 
   Session.prototype.emit = function(type){
@@ -267,13 +277,15 @@
     // callback for handling an http error
     var handleErrorResponse = function(){
       var error = {
-        type: "http_error",
+        type: "http_error"
       };
+
       try {
         error.message = JSON.parse(httpRequest.responseText);
       } catch (e){
         error.message = "http error and cound not parse response as JSON";
       }
+
       callback(error, null, httpRequest);
     }.bind(this);
 
