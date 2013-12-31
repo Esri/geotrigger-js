@@ -130,7 +130,6 @@
         this.token = response.deviceToken.access_token;
         this.deviceId = response.device.deviceId;
       } else {
-        this.refreshToken = response.refresh_token;
         this.token = response.access_token;
       }
 

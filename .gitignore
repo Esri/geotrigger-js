@@ -1,4 +1,5 @@
 reports
+debug.html
 
 # Ignore environment variables set on this machine
 .env
