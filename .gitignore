@@ -39,3 +39,5 @@ tmp
 .yardoc
 _yardoc
 doc/
+
+spec/config.js
