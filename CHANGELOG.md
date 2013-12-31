@@ -1,6 +1,7 @@
 # Geotrigger.js Changelog
 
-## master
+# 0.1.5
+* Fixed a bug where a session created with `clientId` and a `refreshToken` would not properly reauthenticate with AGO if a session expired.
 * add test config
 * add `authentication:restored` event
 
