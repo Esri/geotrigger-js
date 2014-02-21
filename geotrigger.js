@@ -312,6 +312,12 @@
 
     httpRequest.open("POST", url);
     httpRequest.setRequestHeader('Content-Type', (geotriggersRequest) ? 'application/json' : 'application/x-www-form-urlencoded');
+
+    if(geotriggersRequest){
+      httpRequest.setRequestHeader('X-GT-Client-Name', 'geotrigger-js');
+      httpRequest.setRequestHeader('X-GT-Client-Version', '1.0.0');
+    }
+
     httpRequest.send(body);
 
   };
