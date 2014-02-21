@@ -1,5 +1,8 @@
 # Geotrigger.js Changelog
 
+# 1.0.0
+* Add tracking headers for usage reporting
+
 # 0.1.5
 * Fixed a bug where a session created with `clientId` and a `refreshToken` would not properly reauthenticate with AGO if a session expired.
 * add test config
