@@ -267,7 +267,9 @@ Geotrigger JS will handle when your token expires and automatically get a new to
 ## Browser Support
 Geotrigger.js supports any browser that supports [CORS](http://caniuse.com/cors). IE 8 and 9 are  supported but requires the use a proxy to work around limitations with [XDomainRequest](http://blogs.msdn.com/b/ieinternals/archive/2010/05/13/xdomainrequest-restrictions-limitations-and-workarounds.aspx).
 
-A Node.js proxy is supplied in the `proxy` folder. To create your own proxy to support IE 8 and 9 you can use that proxy as a sample implementation. Your proxy will need to forward POST requests like `/proxy/http://geotrigger.arcgis.com/trigger/list` to `http://geotrigger.arcgis.com/trigger/list` with all headers intact.
+A Node.js proxy is supplied in the `proxy` folder. To create your own proxy to support IE 8 and 9 you can use that proxy as a sample implementation. Your proxy will need to forward POST requests like `/proxy/http://geotrigger.arcgis.com/trigger/list` to `http://geotrigger.arcgis.com/trigger/list` with all headers intact.  
+
+Limited testing has shown that our [resource-proxies](https://github.com/Esri/resource-proxy) can be configured to do this successfully.
 
 ## Development Instructions
 
