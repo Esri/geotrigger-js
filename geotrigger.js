@@ -14,8 +14,8 @@
 }(this, function() {
 
   var geotriggersUrl    = "https://geotrigger.arcgis.com/";
-  var tokenUrl          = "https://arcgis.com/sharing/oauth2/token";
-  var registerDeviceUrl = "https://arcgis.com/sharing/oauth2/registerDevice";
+  var tokenUrl          = "https://www.arcgis.com/sharing/oauth2/token";
+  var registerDeviceUrl = "https://www.arcgis.com/sharing/oauth2/registerDevice";
   var exports           = {};
   var CORS              = true;
 
