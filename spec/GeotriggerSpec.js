@@ -175,7 +175,26 @@ describe("geotrigger.js", function() {
             notification:{
               text: "At some random polygon in portland"
             }
-          }
+          },
+          setTags: ['geotrigger-js-test']
+        }, spy);
+      });
+
+      waitsFor(function(){
+        return spy.callCount;
+      }, "Did not run callback", 3000);
+
+      runs(function(){
+        expect(spy).toHaveBeenCalled();
+      });
+    });
+
+    it("should be able to delete a trigger", function(){
+      var spy = jasmine.createSpy();
+
+      runs(function(){
+        geotriggers.request("trigger/delete", {
+          tags: ['geotrigger-js-test']
         }, spy);
       });
 
