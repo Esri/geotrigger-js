@@ -1,5 +1,8 @@
 # Geotrigger.js Changelog
 
+# 1.0.1
+* Change token & device registration URLs to use load balancer ([#39](https://github.com/Esri/geotrigger-js/pull/39))
+
 # 1.0.0
 * Add tracking headers for usage reporting
 
