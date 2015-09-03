@@ -248,7 +248,7 @@
         response = null;
         error = {
           type: "parse_error",
-          message: "cound not parse response as JSON"
+          message: "could not parse response as JSON"
         };
       }
 
@@ -282,7 +282,7 @@
       try {
         error.message = JSON.parse(httpRequest.responseText);
       } catch (e){
-        error.message = "http error and cound not parse response as JSON";
+        error.message = "http error and could not parse response as JSON";
       }
 
       callback(error, null, httpRequest);
