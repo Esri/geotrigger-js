@@ -222,7 +222,7 @@
     // create the url for the request
     var url = (geotriggersRequest) ? this.geotriggersUrl + method : method;
 
-    if (this.proxy) {
+    if (this.proxy && !CORS) {
       url = this.proxy + url;
     }
 
