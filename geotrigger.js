@@ -56,7 +56,8 @@
       tokenUrl: tokenUrl,
       registerDeviceUrl: registerDeviceUrl,
       automaticRegistation: true,
-      proxy: false
+      proxy: false,
+      ignoreCORS: false
     };
 
     // set application id
@@ -216,13 +217,14 @@
     var response;
     var httpRequest;
 
-    // assume this is a request to getriggers is it doesn't start with (http|https)://
+    // assume this is a request to geotriggers if it doesn't start with (http|https)://
     var geotriggersRequest = !method.match(/^https?:\/\//);
 
     // create the url for the request
     var url = (geotriggersRequest) ? this.geotriggersUrl + method : method;
 
-    if (this.proxy && !CORS) {
+    // use a proxy if CORS support isn't present, or developer wants to force it (to do something like pass through credentials)
+    if (this.proxy && this.ignoreCORS && !CORS) {
       url = this.proxy + url;
     }
 

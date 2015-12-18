@@ -265,11 +265,11 @@ By default Geotrigger JS will try to store the session in localStorage. If you w
 Geotrigger JS will handle when your token expires and automatically get a new token for you and rerun your request. You can listen to the `authentication:success` and `authentication:error` events to know when Geotrigger JS is requesting new authentication.
 
 ## Browser Support
-Geotrigger.js supports any browser that supports [CORS](http://caniuse.com/cors). IE 8 and 9 are  supported but requires the use a proxy to work around limitations with [XDomainRequest](http://blogs.msdn.com/b/ieinternals/archive/2010/05/13/xdomainrequest-restrictions-limitations-and-workarounds.aspx).
+Geotrigger.js supports any browser that supports [CORS](http://caniuse.com/cors). IE 8 and 9 are supported but require the use a proxy to work around limitations with [XDomainRequest](http://blogs.msdn.com/b/ieinternals/archive/2010/05/13/xdomainrequest-restrictions-limitations-and-workarounds.aspx).
 
-A Node.js proxy is supplied in the `proxy` folder. To create your own proxy to support IE 8 and 9 you can use that proxy as a sample implementation. Your proxy will need to forward POST requests like `/proxy/http://geotrigger.arcgis.com/trigger/list` to `http://geotrigger.arcgis.com/trigger/list` with all headers intact.  
+A Node.js proxy is supplied in the `proxy` folder. To create your own proxy to support IE 8 and 9 you can use it as a sample. Your proxy will need to forward POST requests like `/proxy/http://geotrigger.arcgis.com/trigger/list` to `http://geotrigger.arcgis.com/trigger/list` with all headers intact. Limited testing has shown that our [resource-proxies](https://github.com/Esri/resource-proxy) can be configured to do this successfully.
 
-Limited testing has shown that our [resource-proxies](https://github.com/Esri/resource-proxy) can be configured to do this successfully.
+If you're interested in forcing **all** requests through a proxy (for example, in order to authenticate on behalf of end users), set `ignoreCORS` to false.
 
 ## Development Instructions
 
