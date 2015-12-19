@@ -224,7 +224,7 @@
     var url = (geotriggersRequest) ? this.geotriggersUrl + method : method;
 
     // use a proxy if CORS support isn't present, or developer wants to force it (to do something like pass through credentials)
-    if (this.proxy && this.ignoreCORS || !CORS) {
+    if (this.proxy && (this.ignoreCORS || !CORS)) {
       url = this.proxy + url;
     }
 
