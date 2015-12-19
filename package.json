@@ -17,7 +17,8 @@
     "grunt-complexity": "~0.1.2"
   },
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt",
+    "build": "grunt build"
   },
   "repository": {
     "type": "git",
@@ -29,5 +30,5 @@
     "Jerry Sievert <jsievert@esri.com> (http://legitimatesounding.com)",
     "Nate Goldman <ngoldman@esri.com> (http://ngoldman.me)"
   ],
-  "license": "Apache 2.0"
+  "license": "Apache-2.0"
 }
