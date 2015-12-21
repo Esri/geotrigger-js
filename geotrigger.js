@@ -304,24 +304,19 @@
 
     var body;
 
-    // set the access token in the body
     if(geotriggersRequest){
-      params.token = this.token;
       body = JSON.stringify(params);
-    } else {
-      body = util.serialize(params);
-    }
-
-    httpRequest.open("POST", url);
-    httpRequest.setRequestHeader('Content-Type', (geotriggersRequest) ? 'application/json' : 'application/x-www-form-urlencoded');
-
-    if(geotriggersRequest){
+      httpRequest.open("POST", url + "?token=" + this.token);
       httpRequest.setRequestHeader('X-GT-Client-Name', 'geotrigger-js');
       httpRequest.setRequestHeader('X-GT-Client-Version', '1.0.0');
+      httpRequest.setRequestHeader('Content-Type', 'application/json');
+    } else {
+      body = util.serialize(params);
+      httpRequest.open("POST", url);
+      httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     }
 
     httpRequest.send(body);
-
   };
 
   Session.prototype.persist = function() {
