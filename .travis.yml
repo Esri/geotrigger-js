@@ -1,5 +1,7 @@
 language: node_js
-before_install: npm install -g grunt-cli
+before_install:
+  - npm install -g grunt-cli
+  - openssl aes-256-cbc -K $encrypted_d6d674658624_key -iv $encrypted_d6d674658624_iv -in spec/config.js.enc -out spec/config.js -d
 sudo: false
 node_js:
   - "0.12"
