@@ -1,5 +1,7 @@
 # geotrigger.js
 
+[![Build Status](https://travis-ci.org/Esri/geotrigger-js.svg?branch=master)](https://travis-ci.org/Esri/geotrigger-js)
+
 An API client for the [ArcGIS Geotrigger Service](https://developers.arcgis.com/en/geotrigger-service/).
 
 1. [Features](#features)
