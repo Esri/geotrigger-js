@@ -1,6 +1,12 @@
 # geotrigger.js
 
-[![Build Status](https://travis-ci.org/Esri/geotrigger-js.svg?branch=master)](https://travis-ci.org/Esri/geotrigger-js)
+[![npm version][npm-img]][npm-url]
+[![build status][travis-img]][travis-url]
+
+[npm-img]: https://img.shields.io/npm/v/geotrigger-js.svg?style=flat-square
+[npm-url]: https://www.npmjs.com/package/geotrigger-js
+[travis-img]: https://img.shields.io/travis/Esri/geotrigger-js/master.svg?style=flat-square
+[travis-url]: https://travis-ci.org/Esri/geotrigger-js
 
 An API client for the [ArcGIS Geotrigger Service](https://developers.arcgis.com/en/geotrigger-service/).
 

@@ -16,6 +16,9 @@ Icon
 # SASS
 .sass-cache
 
+# built
+dist/
+
 # Node
 node_modules
 .grunt
