@@ -8,7 +8,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 * Release script (hopefully)
 
-
 ## [1.0.2] - 2014-12-22
 ### Added
 * proxies are now bypassed in CORS supported browsers (unless new option `ignoreCORS` is set to `true`)

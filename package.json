@@ -20,7 +20,7 @@
     "build": "grunt build",
     "prepublish": "npm run build",
     "release": "./scripts/release.sh",
-    "test": "grunt",
+    "test": "grunt"
   },
   "repository": {
     "type": "git",
