@@ -1,6 +1,6 @@
 {
   "name": "geotrigger-js",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Small client for interacting with the ArcGIS Geotrigger Service.",
   "main": "geotrigger.js",
   "dependencies": {
@@ -17,8 +17,10 @@
     "grunt-complexity": "~0.1.2"
   },
   "scripts": {
+    "build": "grunt build",
+    "prepublish": "npm run build",
+    "release": "./scripts/release.sh",
     "test": "grunt",
-    "build": "grunt build"
   },
   "repository": {
     "type": "git",
