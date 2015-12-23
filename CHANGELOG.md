@@ -4,15 +4,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [1.0.3] - 2014-12-22
-### Fixed
-* Release script (hopefully)
-
-## [1.0.2] - 2014-12-22
+## [1.0.4] - 2014-12-22
 ### Added
 * proxies are now bypassed in CORS supported browsers (unless new option `ignoreCORS` is set to `true`)
 * set up automated continuous integration testing
-* release script to automate tagging releases on github/npm
+* release script to automate tagging releases on github/npm (took a few tries)
 
 ### Fixed
 * removed minified source from version control
@@ -51,9 +47,8 @@ First public release
 ### Fixed
 * Bump verion to prep for beta release of the Geotrigger Service
 
-[Unreleased]: https://github.com/Esri/geotrigger-js/compare/v1.0.1...HEAD
-[1.0.3]: https://github.com/Esri/geotrigger-js/compare/v1.0.2...v1.0.3
-[1.0.2]: https://github.com/Esri/geotrigger-js/compare/v1.0.1...v1.0.2
+[Unreleased]: https://github.com/Esri/geotrigger-js/compare/v1.0.4...HEAD
+[1.0.4]: https://github.com/Esri/geotrigger-js/compare/v1.0.1...v1.0.4
 [1.0.1]: https://github.com/Esri/geotrigger-js/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/Esri/geotrigger-js/compare/v0.1.5...v1.0.0
 [0.1.5]: https://github.com/Esri/geotrigger-js/compare/v0.1.4...v0.1.5

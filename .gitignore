@@ -17,7 +17,7 @@ Icon
 .sass-cache
 
 # built
-dist/
+geotrigger.min.js
 
 # Node
 node_modules

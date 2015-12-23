@@ -11,7 +11,7 @@ git checkout -b gh-release
 npm run build || exit 1
 
 # force add files
-git add dist -f
+git add geotrigger.min.js -f
 
 # commit changes with a versioned commit message
 git commit -m "build $VERSION"
@@ -19,11 +19,8 @@ git commit -m "build $VERSION"
 # push commit so it exists on GitHub when we run gh-release
 git push upstream gh-release
 
-# create a ZIP archive of the dist files
-zip -r $NAME-v$VERSION.zip dist
-
 # run gh-release to create the tag and push release to github
-gh-release --assets $NAME-v$VERSION.zip
+gh-release --assets geotrigger.min.js
 
 # checkout master and delete release branch locally and on GitHub
 git checkout master
