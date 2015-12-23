@@ -4,14 +4,11 @@
 VERSION=$(node --eval "console.log(require('./package.json').version);")
 NAME=$(node --eval "console.log(require('./package.json').name);")
 
-# build and test
-npm test || exit 1
-
 # checkout temp branch for release
 git checkout -b gh-release
 
-# run prepublish to build files
-npm run build
+# run build/test and exit if theres a problem
+npm run build || exit 1
 
 # force add files
 git add dist -f
