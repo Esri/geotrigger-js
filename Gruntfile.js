@@ -41,7 +41,7 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          'dist/geotrigger.min.js': ['geotrigger.js']
+          'geotrigger.min.js': ['geotrigger.js']
         }
       }
     },

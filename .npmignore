@@ -27,3 +27,5 @@ working
 
 # Docs Build
 site/build
+
+# dont ignore geotrigger.min.js, because we want the compiled source in the release
